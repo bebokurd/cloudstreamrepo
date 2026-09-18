@@ -1,21 +1,21 @@
 <div align="center">
 
-# CHYA TV
+# چیا TV
 
-### إضافات عربية وكوردية لـ Cloudstream
+### زیادکراوە عەرەبی و کوردییەکان بۆ Cloudstream
 
-_Tons of Arabic & Kurdish content, united in one repo._
+_هەموو ناوەڕۆکی عەرەبی و کوردی، لە یەک ڕیپۆدا._
 
 <br>
 
 ![Plugins](https://img.shields.io/badge/Plugins-40-00c3ff?style=for-the-badge)
 ![Streaming](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=for-the-badge)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3+-00c3ff?style=for-the-badge)
-![License](https://img.shields.io/badge/Open%20Source-Yes-00ff9d?style=for-the-badge)
+![License](https://img.shields.io/badge/سەرچاوە%20کراوە-بەڵێ-00ff9d?style=for-the-badge)
 
 <br>
 
-[![Add repo — CHYA TV](https://img.shields.io/badge/%E2%96%BC%20Add%20Repo%20%E2%9C%93-CHYA%20TV-00c3ff?style=for-the-badge&logo=addthis&logoColor=white)](https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json)
+[![ڕیپۆ زیاد بکە](https://img.shields.io/badge/ڕیپۆ%20زیاد%20بکە-CHYA%20TV-00c3ff?style=for-the-badge&logo=addthis&logoColor=white)](https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json)
 
 ```text
 https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json
@@ -25,78 +25,78 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 ---
 
-## ✨ Features
+## ✨ تایبەتمەندییەکان
 
 | | | |
 |---|---|---|
-| 🎬 **40 Arabic providers** — movies, series, anime & TV | 📡 **Native playback** — automatic DASH / HLS support | 🟣 **Kurdish** — full Rashaba integration |
-| ⚡ **Lightweight** `.cs3` extensions | 🔍 **Deep search** across all sources | 🖥️ **Android TV** remote-friendly codes |
+| 🎬 **٤٠ زیادکراوی عەرەبی** — فیلم، زنجیرە، ئەنیمێ و تەلەڤیزیۆن | 📡 **پەخشی ڕەسەن** — DASH / HLS | 🟣 **کوردی** — رەشەبای تەواو یەکخراوە |
+| ⚡ **سووکە** — فایلی `.cs3` | 🔍 **گەڕانێکی قووڵ** لە هەموو سەرچاوەکان | 🖥️ **تەلەڤیزیۆنی ئەندرۆید** — کۆدی کورت |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 دەستپێکردن
 
 | | |
 |---|---|
-| **1.** | Open **Cloudstream** → tap the **⚙️ Settings** → **Repositories** |
-| **2.** | Tap **Add Repository** → paste the link above → confirm |
-| **3.** | Back out to **Plugins** → pull-to-refresh → install **CHYA TV** |
-| **4.** | Done — providers appear on your home & search screens |
+| **١.** | **Cloudstream** بکەرەوە → **⚙️ ڕێکخستنەکان** → **ڕیپۆکان** |
+| **٢.** | **ڕیپۆ زیاد بکە** → لینکەکە لە سەرەوە پەیست بکە → پشتڕاستی بکەرەوە |
+| **٣.** | بگەڕێوە بۆ **زیادکراوەکان** → ڕاکێشان بۆ خوارەوە بۆ نوێکردنەوە → **چیا TV** دامەزرێنە |
+| **٤.** | تەواوە — زیادکراوەکان لە شاشەی سەرەکی و لە گەڕاندا دەردەکەون |
 
-### 📺 Android TV shortcut
+### 📺 کورتکۆد بۆ تەلەڤیزیۆنی ئەندرۆید
 
-Typing on a remote is painful — try a short code instead:
+نووسینی لینکەکە بە ڕیمۆت ماندووکەرە — کەمێک لەم کۆدانە تاقی بکەرەوە:
 
-| Short code | |
+| کۆد | |
 |:---:|:---:|
 | `CHYA` | ☁️ |
 | `arb` | 🎬 |
 | `343` | 📺 |
 
-> If a short code fails to resolve, open Cloudstream **DNS settings** ⚙️ and switch to another DNS provider.
+> ئەگەر کۆدەکە نەکرایەوە، لە **ڕێکخستنەکانی** Cloudstream بەشی **DNS** بگۆڕە بۆ سێرڤەری تر.
 
 ---
 
-## 📦 Providers
+## 📦 زیادکراوەکان
 
-### 🟣 Featured — Rashaba
+### 🟣 تایبەت — رەشەبا
 
-The Kurdish video platform: movies & series in a **DASH / HLS** hybrid player, highlighted here because it's fully integrated with **CHYA TV**.
+پلاتفۆرمی ڤیدیۆی کوردی: فیلم و زنجیرە بە **DASH / HLS**، بە تەواوی یەکخراوە لەگەڵ **چیا TV**.
 
-### ☁️ All sources
+### ☁️ هەموو سەرچاوەکان
 
 | | |
 |---|---|
 | `3isk` · `Aflaam` · `Aia2tv 2` · `Akwam` · `Alooytv` | `Anim3rb` · `AnimePhoenix` · `Anime4up` · `AnimeRift` |
 | `Animerco` · `Animewitcher` · `Bristege` · `Cee` | `CimaClub` · `Cimalight` · `Cimatn` · `cinemana` |
 | `dima-toon` · `Egydead` · `Elif` · `eseek` · `Faselhd` | `Krmzy` · `Lodynet` · `MyCimaProvider` |
-| **`Rashaba`** *(كوردی)* · `Replaymatch` · `Shahid4u` | `Shahidwbas` · `Syria-live` · `Topcinema` |
+| **`Rashaba`** · `Replaymatch` · `Shahid4u` | `Shahidwbas` · `Syria-live` · `Topcinema` |
 | `TukTukcima` · `TuniflexBlog` · `Tuniflix` · `TVgarden` | `Viu` · `Wecima` · `Witanime` · `Yacintv` · `Youtube` |
 
 ---
 
-## ❓ Troubleshooting
+## ❓ چارەسەری کێشەکان
 
-| Symptom | Fix |
+| نیشانە | چارەسەر |
 |---|---|
-| Repo not showing after add | Pull-to-refresh in **Plugins** & re-enter the repo URL |
-| Short code fails | Change the **DNS provider** in Cloudstream settings |
-| Video won't play / token expired | Refresh the title's page & try again — live tokens expire after a few hours |
-| Stuck on old plugin | Reinstall **CHYA TV** — each update ships with a new indexed hash |
-| Missing subtitles | Some sources have no subtitle track — that's server-side, not a bug |
+| ڕیپۆکە لەدوای زیادکردن دەرناکەوێت | لە **زیادکراوەکان** ڕاکێشان بۆ خوارەوە و لینکەکە دووبارە بنووسەوە |
+| کورتکۆدەکە ناکات | سێرڤەری **DNS** لە ڕێکخستنەکانی Cloudstream بگۆڕە |
+| ڤیدیۆکە نایلێت / تۆکەنێک بەسەرچووە | پەیجەکە نوێ بکەرەوە و هەوڵ بدەرەوە — تۆکەنەکان چەند سەعاتێک دەمێننەوە |
+| وەشانی کۆنە | **چیا TV** دووبارە دامەزرێنە — هەر نوێکردنەوەیەک هاشێکی نوێی هەیە |
+| ژێرنووس نییە | هەندێک سەرچاوە ژێرنووسی نییە — ئەمە لە سێرڤەرەکەوەیە، کێشەی منداڵباوە نییە |
 
 ---
 
-## ⚖️ Legal
+## ⚖️ یاسا
 
-- **No content is hosted** by this repository or by Cloudstream — extensions only fetch video files from third-party websites, just like a web browser.
-- Users are responsible for complying with their **local laws**; copyright holders should contact the actual file hosts.
-- Issues, feature requests, and PRs for new providers (or fixes) are always welcome. 💙
+- **هیچ ناوەڕۆکێک** لەم ڕیپۆیە یان لە Cloudstream هەڵناگیرێت — زیادکراوەکان تەنها فایلی ڤیدیۆ لە وێبسایتەکانی تر دەگرن، وەک وێبگەڕێکی ئاسایی.
+- بەرپرسیارێتی بەکارهێنەرە بۆ ڕەچاوکردنی **یاسا ناوخۆیییەکانی** وڵاتەکەی؛ خاوەنی مافەکان پێویستە سەرچاوە ڕاستەکییەکە بخەنە بەرپرس.
+- کێشە، داواکاریی نوێ، و PR بۆ زیادکراوەی نوێ یان چارەسەری هەمیشە بەخێرهاتن. 💙
 
 ---
 
 <div align="center">
 
-**CHYA TV** — _watch free, watch clean_ ✨
+**چیا TV** — _بە خۆشییەوە سەیر بکە_ ✨
 
 </div>
