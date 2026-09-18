@@ -1,0 +1,8 @@
+{
+    "name": "CHYA TV",
+    "description": "مشاهدة الافلام والمسلسلات تجربة خالية من الاعلانات",
+    "manifestVersion": 1,
+    "pluginLists": [
+        "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/plugins.json"
+    ]
+}
