@@ -1,80 +1,104 @@
-<h1 align="center">📺 إضافات عربية لـ Cloudstream</h1>
+<div align="center">
 
-<h3 align="center">
-إضافات عربية مصنوعة لكم يا غوالي — من إنتاجي الشخصي لتجربة مشاهدة أسهل وأمتع للأفلام والمسلسلات بالعربية.
+# CHYA TV
+
+### إضافات عربية لـ Cloudstream
+
 <br>
-هذه الإضافات تهدف لتجميع أفضل المصادر العربية في مكان واحد، لتتمكن من الاستمتاع بالمحتوى بسهولة وسلاسة.
-</h3>
 
-<p align="center">
-✨ <b>سهلة الاستخدام • عملية • خفيفة الوزن • تجربة سلسة</b><br>
-🎬 تدعم جميع أنواع الأفلام والمسلسلات مع التركيز على تجربة مشاهدة ممتعة.
-</p>
+itches of Arabic content, united in one repo.
 
-<h2>⬇️ انسخ الرابط والصقه في التطبيق أو اضغط على الصورة لتحميل الإضافات</h2>
+`40` providers · `DASH` & `HLS` · open source
 
-<p align="left">
-https://raw.githubusercontent.com/Abodabodd/re-3arabi/refs/heads/main/repo.json
-</p>
-<p align="left">
-<a href="https://abodabodd.github.io/testpage/">
-<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbrCPMjoDiORDnpcSxcPa6g-7bWW31r6-BLQ&s" />
-</a>
-</p>
+<br>
 
-<h2>📺 لمستخدمي التلفاز (Android TV)</h2>
-<p>
-بدلاً من كتابة الرابط الكامل باستخدام الريموت، يمكنك استخدام أحد الرموز المختصرة التالية داخل خانة إضافة المستودع:
-</p>
+[![Add Repo](https://img.shields.io/badge/Add_Repo-CHYA_TV-00c3ff?style=for-the-badge&logo=cloudstream&logoColor=white)](https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json)
 
 ```text
-arb
-```
-```text
-343
+https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json
 ```
 
-<p>اذا لم يفتح غير الdns من اعدادات كلاودستريم ⚙️</p>
+</div>
 
-<h2>🌟 الهدف</h2>
-<ul>
-<li>📌 توفير محتوى عربي مناسب وسهل الوصول.</li>
-<li>🚀 تحسين تجربة المشاهدة على تطبيق Cloudstream.</li>
-<li>🤝 مشاركة المجتمع العربي بملحقات مفتوحة قابلة للتطوير.</li>
-</ul>
+---
 
-<h2>🛠️ المشاركة</h2>
-<ul>
-<li>إذا أعجبتك هذه الإضافات يمكنك:</li>
-<ul>
-<li>✅ استخدامها مباشرة.</li>
-<li>✏️ تعديلها بما يناسبك.</li>
-<li>💡 المساهمة باقتراحات أو تحسينات.</li>
-</ul>
-</ul>
+## Installation
 
-<h2>⚖️ الحقوق</h2>
-<p>📝 حقوق التعديل والاستخدام مفتوحة لجميع المستخدمين.</p>
+1. Open **Cloudstream** → Settings ⚙️ → **Repositories**
+2. Tap **Add Repository** and paste the link above
+3. Go back to **Plugins** → enable **Show unsourced** → install **CHYA TV** from the new repo
+4. Done — providers appear in the search/home screen
 
-<h2>⚖️ DMCA Disclaimer</h2>
-<p>
-We hereby issue this notice to clarify that these extensions function similarly to a standard web browser by fetching video files from the internet.
-</p>
+### Android TV shortcut
 
-<ul>
-<li>❌ No content is hosted by this repository or the Cloudstream 3 application.</li>
-<li>🌐 Any content accessed is hosted by third-party websites.</li>
-<li>👤 Users are solely responsible for their usage and must comply with their local laws.</li>
-<li>📩 If you believe content is violating copyright laws, please contact the actual file hosts, not the developers of this repository or the Cloudstream 3 app.</li>
-</ul>
+Instead of typing the full URL, enter one of these short codes in the repo field:
 
-<hr>
+| Code | |
+|:----:|:-:|
+| `CHYA` | ☁️ |
+| `arb` | 🎬 |
 
-<p align="center">
-💖 <b>استمتع بالمشاهدة وشارك التجربة مع الأصدقاء!</b>
-</p>
+> If neither short code resolves, open Cloudstream **DNS settings** ⚙️ and change the DNS provider.
 
+---
 
+## Providers
 
+| Provider | Type | Language |
+|----------|------|----------|
+| 3isk | HLS | Arabic |
+| Aflaam | HLS | Arabic |
+| Aia2tv | HLS | Arabic |
+| Akwam | HLS | Arabic |
+| Alooytv | HLS | Arabic |
+| Anim3rb | HLS | Arabic |
+| Anime-Phoenix | HLS | Arabic |
+| Anime4up | HLS | Arabic |
+| AnimeRift | HLS | Arabic |
+| Animerco | HLS | Arabic |
+| Animewitcher | HLS | Arabic |
+| Bristege | HLS | Arabic |
+| Cee | HLS | Arabic |
+| CimaClub | HLS | Arabic |
+| Cimalight | HLS | Arabic |
+| Cimatn | HLS | Arabic |
+| Cinemana | HLS | Arabic |
+| dima-toon | HLS | Arabic |
+| Egydead | HLS | Arabic |
+| Elif | HLS | Arabic |
+| eseek | HLS | Arabic |
+| Faselhd | HLS | Arabic |
+| Krmzy | HLS | Arabic |
+| Lodynet | HLS | Arabic |
+| MyCimaProvider | HLS | Arabic |
+| **Rashaba** | **DASH / HLS** | **Kurdish** |
+| Replaymatch | HLS | Arabic |
+| Shahid4u | HLS | Arabic |
+| Shahidwbas | HLS | Arabic |
+| Syria-live | HLS | Arabic |
+| Topcinema | HLS | Arabic |
+| TukTukcima | HLS | Arabic |
+| TuniflexBlog | HLS | Arabic |
+| Tuniflix | HLS | Arabic |
+| TVgarden | HLS | Arabic |
+| Viu | HLS | Arabic |
+| Wecima | HLS | Arabic |
+| Witanime | HLS | Arabic |
+| Yacintv | HLS | Arabic |
+| Youtube | HLS | Multi |
 
+---
 
+## Notes
+
+- **No content is hosted** by this repository or Cloudstream. Extensions fetch video from third-party sites.
+- Users are responsible for complying with their local laws.
+- Contributions, bug reports, and new provider PRs are welcome.
+
+---
+
+<div align="center">
+
+**CHYA TV** · watch free, watch clean
+
+</div>
