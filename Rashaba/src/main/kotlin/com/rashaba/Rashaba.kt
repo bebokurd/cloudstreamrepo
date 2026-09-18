@@ -155,12 +155,6 @@ class RashabaProvider : MainAPI() {
             return false
         }
 
-        val queryIndex = manifest.indexOf('?')
-        val subtitleUrl = if (queryIndex >= 0)
-            manifest.substring(0, queryIndex) + ".vtt" + manifest.substring(queryIndex)
-        else manifest + ".vtt"
-        subtitleCallback(SubtitleFile("ku", subtitleUrl))
-
         val type = if (manifest.substringBefore('?').endsWith(".mpd"))
             ExtractorLinkType.DASH else ExtractorLinkType.M3U8
 
