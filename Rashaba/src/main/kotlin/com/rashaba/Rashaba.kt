@@ -124,7 +124,7 @@ class RashabaProvider : MainAPI() {
         val poster = doc.selectFirst("meta[property=og:image]")?.attr("content")
         val plot = doc.selectFirst("meta[property=og:description]")?.attr("content")
         return newMovieLoadResponse(title, id, TvType.Movie, id) {
-            this.posterUrl = fixUrl(poster)
+            this.posterUrl = poster?.let { fixUrl(it) }
             this.plot = plot
         }
     }
@@ -290,9 +290,9 @@ private object RashabaProxy {
                     out.flush()
                     return
                 }
-                val body = resp.body
+                val body = runCatching { resp.body.bytes() }.getOrNull()
                 if (body == null) {
-                    out.write(plainResponse(500, "Empty Response"))
+                    out.write(plainResponse(500, "Empty Body"))
                     out.flush()
                     return
                 }
