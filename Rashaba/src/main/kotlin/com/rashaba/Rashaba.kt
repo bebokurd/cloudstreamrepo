@@ -154,6 +154,13 @@ class RashabaProvider : MainAPI() {
             Log.w(name, "No manifest found on embed page for id $id")
             return false
         }
+        manifest = when {
+            manifest.startsWith("http://") || manifest.startsWith("https://") -> manifest
+            manifest.startsWith("//") -> "https:$manifest"
+            manifest.startsWith("/") -> mainUrl + manifest
+            else -> "$mainUrl/$manifest"
+        }
+        Log.d(name, "resolved manifest: $manifest")
 
         val type = if (manifest.substringBefore('?').endsWith(".mpd"))
             ExtractorLinkType.DASH else ExtractorLinkType.M3U8
