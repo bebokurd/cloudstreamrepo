@@ -6,7 +6,7 @@
 
 <br>
 
-itches of Arabic content, united in one repo.
+Tons of Arabic content, united in one repo.
 
 `40` providers · `DASH` & `HLS` · open source
 
