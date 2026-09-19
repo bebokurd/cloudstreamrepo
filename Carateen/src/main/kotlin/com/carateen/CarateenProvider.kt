@@ -430,23 +430,25 @@ class CarateenProvider : MainAPI() {
                 } else if (token.startsWith("tgEp:")) {
                     val epId = token.removePrefix("tgEp:")
                     val response = app.get("$mainUrl/api/episode?id=$epId", headers = standardHeaders)
-                    val streamUrl = decryptObject(response.text).optString("streamUrl")
+                    val streamUrl = decryptObject(response.text).optString("streamUrl").trim()
                     if (streamUrl.isBlank()) return@forEach
-                    if (streamUrl.trimStart().startsWith("<")) return@forEach
-                    if (streamUrl.contains(".m3u8", ignoreCase = true)) {
+                    val resolved = if (streamUrl.startsWith("//")) "https:$streamUrl" else streamUrl
+                    if (!resolved.startsWith("https://") && !resolved.startsWith("http://")) return@forEach
+                    val isDash = resolved.contains(".mpd", ignoreCase = true)
+                    if (resolved.contains(".m3u8", ignoreCase = true) || isDash) {
                         callback(
                             newExtractorLink(
                                 source = name,
-                                name = "Carateen - HLS",
-                                url = streamUrl
+                                name = "Carateen - ${if (isDash) "DASH" else "HLS"}",
+                                url = resolved
                             ) {
                                 referer = "$mainUrl/"
                                 quality = Qualities.Unknown.value
-                                type = ExtractorLinkType.M3U8
+                                type = if (isDash) ExtractorLinkType.DASH else ExtractorLinkType.M3U8
                             }
                         )
                     } else {
-                        loadExtractor(streamUrl, "$mainUrl/", subtitleCallback, callback)
+                        loadExtractor(resolved, "$mainUrl/", subtitleCallback, callback)
                     }
                 }
             } catch (e: Exception) {
