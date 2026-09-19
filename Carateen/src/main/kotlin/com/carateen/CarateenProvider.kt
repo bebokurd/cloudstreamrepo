@@ -421,7 +421,7 @@ class CarateenProvider : MainAPI() {
                             newExtractorLink(
                                 source = name,
                                 name = "Carateen - HLS",
-                                url = link
+                                url = resolveBestHlsVariant(link)
                             ) {
                                 referer = "$mainUrl/"
                                 headers = playbackHeaders
@@ -443,7 +443,7 @@ class CarateenProvider : MainAPI() {
                             newExtractorLink(
                                 source = name,
                                 name = "Carateen - ${if (isDash) "DASH" else "HLS"}",
-                                url = resolved
+                                url = if (isDash) resolved else resolveBestHlsVariant(resolved)
                             ) {
                                 referer = "$mainUrl/"
                                 headers = playbackHeaders
@@ -460,5 +460,20 @@ class CarateenProvider : MainAPI() {
             }
         }
         return true
+    }
+
+    private suspend fun resolveBestHlsVariant(master: String): String {
+        if (!master.contains(".m3u8", ignoreCase = true)) return master
+        return runCatching {
+            val text = app.get(master, headers = standardHeaders).text
+            if (!text.contains("#EXT-X-STREAM-INF", ignoreCase = true)) return master
+            val regex = Regex("""#EXT-X-STREAM-INF:[^\n]*?BANDWIDTH=(\d+)[^\n]*\n\s*(\S+)""")
+            val best = regex.findAll(text)
+                .map { it.groupValues[1].toLongOrNull() ?: 0L to it.groupValues[2].trim() }
+                .maxByOrNull { it.first } ?: return master
+            val child = best.second
+            if (child.startsWith("https://") || child.startsWith("http://")) child
+            else master.substringBeforeLast('/') + "/" + child
+        }.getOrElse { master }
     }
 }
