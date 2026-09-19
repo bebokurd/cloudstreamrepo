@@ -1,24 +1,7 @@
 package com.shahid
 
-import com.lagradost.cloudstream3.Episode
-import com.lagradost.cloudstream3.ErrorLoadingException
-import com.lagradost.cloudstream3.HomePageList
-import com.lagradost.cloudstream3.HomePageResponse
-import com.lagradost.cloudstream3.LoadResponse
-import com.lagradost.cloudstream3.MainAPI
-import com.lagradost.cloudstream3.MainPageRequest
-import com.lagradost.cloudstream3.SearchResponse
-import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.app
-import com.lagradost.cloudstream3.mainPageOf
-import com.lagradost.cloudstream3.newEpisode
-import com.lagradost.cloudstream3.newHomePageResponse
-import com.lagradost.cloudstream3.newMovieLoadResponse
-import com.lagradost.cloudstream3.newMovieSearchResponse
-import com.lagradost.cloudstream3.newTvSeriesLoadResponse
-import com.lagradost.cloudstream3.newTvSeriesSearchResponse
-import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.SubtitleFile
+import com.lagradost.cloudstream3.*
+import com.lagradost.cloudstream3.utils.*
 import org.json.JSONObject
 import java.net.URLEncoder
 import java.util.UUID
@@ -243,7 +226,7 @@ class ShahidProvider : MainAPI() {
         }
     }
 
-    private fun movieLoad(pm: JSONObject, url: String): LoadResponse {
+    private suspend fun movieLoad(pm: JSONObject, url: String): LoadResponse {
         val title = pm.optString("title").ifBlank { "MBC Shahid" }
         return newMovieLoadResponse(title, url, TvType.Movie, url) {
             this.posterUrl = imageOf(pm)
