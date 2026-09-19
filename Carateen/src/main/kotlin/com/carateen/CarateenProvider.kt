@@ -469,7 +469,7 @@ class CarateenProvider : MainAPI() {
             if (!text.contains("#EXT-X-STREAM-INF", ignoreCase = true)) return master
             val regex = Regex("""#EXT-X-STREAM-INF:[^\n]*?BANDWIDTH=(\d+)[^\n]*\n\s*(\S+)""")
             val best = regex.findAll(text)
-                .map { it.groupValues[1].toLongOrNull() ?: 0L to it.groupValues[2].trim() }
+                .map { (it.groupValues[1].toLongOrNull() ?: 0L) to it.groupValues[2].trim() }
                 .maxByOrNull { it.first } ?: return master
             val child = best.second
             if (child.startsWith("https://") || child.startsWith("http://")) child
