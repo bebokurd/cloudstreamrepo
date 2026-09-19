@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مسلسلات آسيوية وتركية مترجمة بجودة عالية"
     authors = listOf("Abodabodd")
     language = "ar"
 

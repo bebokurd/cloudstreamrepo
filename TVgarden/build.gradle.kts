@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مشاهدة القنوات التلفزيونية العالمية بث مباشر"
     authors = listOf("Abodabodd")
     language = "ar"
 

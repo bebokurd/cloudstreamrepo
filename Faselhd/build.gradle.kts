@@ -1,7 +1,7 @@
 version = 3
 
 cloudstream {
-    description = ""
+    description = "أفلام ومسلسلات بجودات وسيرفرات متعددة"
     authors = listOf("Abodabodd")
     language = "ar"
 

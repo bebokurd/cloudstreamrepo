@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مشاهدة وتحميل الأنمي والكرتون مترجم بالعربية"
     authors = listOf("Abodabodd")
     language = "ar"
 

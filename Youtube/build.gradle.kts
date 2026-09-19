@@ -1,7 +1,7 @@
 version = 2
 
 cloudstream {
-    description = ""
+    description = "مشاهدة فيديوهات يوتيوب داخل CloudStream"
     authors = listOf("Abodabodd")
     language = "ar"
 

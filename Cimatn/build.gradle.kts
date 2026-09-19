@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "أفلام ومسلسلات تونسية وعربية بجودة عالية"
     authors = listOf("Abodabodd")
     language = "ar"
 

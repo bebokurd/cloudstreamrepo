@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مشاهدة الأنمي المترجم بالعربية"
     authors = listOf("Abodabodd")
     language = "ar"
 

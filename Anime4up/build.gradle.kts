@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مشاهدة الأنمي مترجم ومدبلج بالعربية بجودة عالية"
     authors = listOf("Abodabodd")
     language = "ar"
 

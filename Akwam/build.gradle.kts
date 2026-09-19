@@ -1,7 +1,7 @@
 version = 3
 
 cloudstream {
-    description = ""
+    description = "أفلام ومسلسلات وأنمي مترجمة ومدبلجة بجودة عالية"
     authors = listOf("Abodabodd")
     language = "ar"
 

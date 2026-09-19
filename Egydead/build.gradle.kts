@@ -1,7 +1,7 @@
 version = 1
 
 cloudstream {
-    description = ""
+    description = "مشاهدة وتحميل أحدث الأفلام والمسلسلات"
     authors = listOf("Abodabodd")
     language = "ar"
 
