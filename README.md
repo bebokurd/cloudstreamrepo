@@ -8,7 +8,7 @@ _هەموو ناوەڕۆکی عەرەبی و کوردی، لە یەک ڕیپۆد
 
 <br>
 
-![Plugins](https://img.shields.io/badge/Plugins-41-00c3ff?style=for-the-badge)
+![Plugins](https://img.shields.io/badge/Plugins-42-00c3ff?style=for-the-badge)
 ![Streaming](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=for-the-badge)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3+-00c3ff?style=for-the-badge)
 ![License](https://img.shields.io/badge/سەرچاوە%20کراوە-بەڵێ-00ff9d?style=for-the-badge)
@@ -29,7 +29,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |---|---|---|
-| 🎬 **٤١ زیادکراوی عەرەبی** — فیلم، زنجیرە، ئەنیمێ و تەلەڤیزیۆن | 📡 **پەخشی ڕەسەن** — DASH / HLS | 🟣 **کوردی** — رەشەبای تەواو یەکخراوە |
+| 🎬 **٤٢ زیادکراوی عەرەبی** — فیلم، زنجیرە، ئەنیمێ و تەلەڤیزیۆن | 📡 **پەخشی ڕەسەن** — DASH / HLS | 🟣 **کوردی** — رەشەبای تەواو یەکخراوە |
 | ⚡ **سووکە** — فایلی `.cs3` | 🔍 **گەڕانێکی قووڵ** لە هەموو سەرچاوەکان | 🖥️ **تەلەڤیزیۆنی ئەندرۆید** — کۆدی کورت |
 
 ---
@@ -70,7 +70,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 | `3isk` · `Aflaam` · `Aia2tv 2` · `Akwam` · `Alooytv` | `Anim3rb` · `AnimePhoenix` · `Anime4up` · `AnimeRift` |
 | `Animerco` · `Animewitcher` · `Bristege` · `Carateen` · `Cee` | `CimaClub` · `Cimalight` · `Cimatn` · `cinemana` |
 | `dima-toon` · `Egydead` · `Elif` · `eseek` · `Faselhd` | `Krmzy` · `Lodynet` · `MyCimaProvider` |
-| **`Rashaba`** · `Replaymatch` · `Shahid4u` | `Shahidwbas` · `Syria-live` · `Topcinema` |
+| `Stardima` · **`Rashaba`** · `Replaymatch` · `Shahid4u` | `Shahidwbas` · `Syria-live` · `Topcinema` |
 | `TukTukcima` · `TuniflexBlog` · `Tuniflix` · `TVgarden` | `Viu` · `Wecima` · `Witanime` · `Yacintv` · `Youtube` |
 
 ---
