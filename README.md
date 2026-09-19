@@ -1,6 +1,6 @@
 <div align="center">
 
-# CHYA TV
+<img src="https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/main/assets/chya-banner.svg" width="820" alt="CHYA TV banner">
 
 ### Arabic & Kurdish plugins for CloudStream
 
