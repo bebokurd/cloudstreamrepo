@@ -346,7 +346,7 @@ class StardimaProvider : MainAPI() {
         }.onFailure { logError(it) }
     }
 
-    private fun scanForStreams(
+    private suspend fun scanForStreams(
         text: String,
         referer: String,
         emitted: MutableSet<String>,
@@ -360,7 +360,7 @@ class StardimaProvider : MainAPI() {
         }
     }
 
-    private fun emitLink(
+    private suspend fun emitLink(
         rawUrl: String,
         type: ExtractorLinkType,
         referer: String,
