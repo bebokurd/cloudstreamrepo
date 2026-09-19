@@ -159,12 +159,10 @@ class CarateenProvider : MainAPI() {
                 val showId = obj.optLong("tv_series_id")
                 val title = obj.optString("name").ifBlank { return@mapNotNull null }
                 val poster = obj.optString("cover_full_path")
-                val epTitle = obj.optString("pref")
                 val epNum = obj.optInt("number", 0)
                 val displayName = if (epNum > 0) "$title - الحلقة $epNum" else title
                 newTvSeriesSearchResponse(displayName, "$mainUrl/watch/sp/$showId", TvType.Cartoon) {
                     this.addPoster(poster)
-                    if (epTitle.isNotBlank()) this.plot = epTitle
                 }
             }.distinctBy { it.url }
             if (items.isNotEmpty()) {
@@ -344,7 +342,6 @@ class CarateenProvider : MainAPI() {
         var title = ""
         var poster: String? = null
         var plot: String? = null
-        var quality: String? = null
         var year: Int? = null
         var category = ""
 
@@ -356,7 +353,6 @@ class CarateenProvider : MainAPI() {
                     title = obj.optString("title")
                     poster = tgPoster(obj.optString("poster_cover")).ifBlank { null }
                     plot = obj.optString("description").ifBlank { null }
-                    quality = obj.optString("quality").ifBlank { null }
                     year = obj.optString("release_year").toIntOrNull()
                     category = obj.optString("category")
                     break
@@ -391,14 +387,12 @@ class CarateenProvider : MainAPI() {
                 this.posterUrl = poster
                 this.plot = plot
                 this.year = year
-                if (quality != null) this.quality = quality
             }
         } else {
             newTvSeriesLoadResponse(title, url, TvType.Cartoon, episodes) {
                 this.posterUrl = poster
                 this.plot = plot
                 this.year = year
-                if (quality != null) this.quality = quality
             }
         }
     }
