@@ -150,7 +150,7 @@ class StardimaProvider : MainAPI() {
     }
 
     private suspend fun fetchListing(path: String, page: Int): Pair<List<SearchResponse>, Int> {
-        if (page < 1) return emptyList() to 1
+        if (page < 1) return emptyList<SearchResponse>() to 1
         val sep = if (path.contains("?")) "&" else "?"
         val text = runCatching {
             app.get("$mainUrl$path${sep}page=$page", headers = xhrHeaders).text
@@ -180,9 +180,9 @@ class StardimaProvider : MainAPI() {
         }
         val slug = remaining.first()
         val series = runCatching { fetchListing("/mosalsalat?category=$slug", 1).first }
-            .getOrDefault(emptyList())
+            .getOrDefault(emptyList<SearchResponse>())
         val movies = runCatching { fetchListing("/aflam?category=$slug", 1).first }
-            .getOrDefault(emptyList())
+            .getOrDefault(emptyList<SearchResponse>())
         val items = if (series.isNotEmpty()) series else movies
         return newHomePageResponse(listOf(HomePageList("التصنيفات", items)), hasNext = remaining.size > 1)
     }
