@@ -19,6 +19,60 @@ class StardimaProvider : MainAPI() {
         TvType.Movie
     )
 
+    override val mainPage = mainPageOf(
+        "/newrelases" to "آخر ما تمت إضافته",
+        "/aflam" to "أفلام",
+        "/mosalsalat" to "مسلسلات",
+        "/aflam?language=sub" to "أفلام - مترجم",
+        "/aflam?language=dub" to "أفلام - مدبلج",
+        "/mosalsalat?language=sub" to "مسلسلات - مترجم",
+        "/mosalsalat?language=dub" to "مسلسلات - مدبلج",
+        "/aflam?premium=free" to "أفلام - مجانية",
+        "/aflam?premium=paid" to "أفلام - مدفوعة",
+        "/mosalsalat?premium=free" to "مسلسلات - مجانية",
+        "/mosalsalat?premium=paid" to "مسلسلات - مدفوعة",
+        "categories" to "التصنيفات"
+    )
+
+    private val categorySlugs = listOf(
+        "ben10",
+        "mbc3",
+        "tom-and-jerry",
+        "abtal-alakshn",
+        "aaamal-krysmas-christmas",
+        "aflam-boku-no-hero-academia",
+        "aflam-harry-potter",
+        "aflam-barby",
+        "aflam-gyym-jeem",
+        "aflam-dot-sdyk-altbyaa",
+        "aflam-doraymon-doraemon-movie",
+        "aflam-skoby-do-scooby-doo",
+        "aflam-aaayly",
+        "aflam-ksyr",
+        "aflam-konan",
+        "aflam-naorto",
+        "aflam-hary-botr",
+        "akshn",
+        "asdarat-gdyd",
+        "asdarat-sbyston",
+        "asdarat-kaml-bdon-hthf",
+        "abtal",
+        "anmy",
+        "barby",
+        "rmdan-2026",
+        "sbys-baor",
+        "sbyston",
+        "krton",
+        "krton-aslamy",
+        "krton-zman",
+        "krton-ntork",
+        "mstmr",
+        "mslslat",
+        "mghamrat",
+        "nynga",
+        "okt-almghamr"
+    )
+
     private val ua =
         "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36"
 
@@ -95,10 +149,16 @@ class StardimaProvider : MainAPI() {
         return list
     }
 
-    private suspend fun parseJsonListing(path: String, page: Int): List<SearchResponse> {
-        if (page < 1) return emptyList()
-        val text = app.get("$mainUrl$path?page=$page", headers = xhrHeaders).text
-        return parseVideoArray(text)
+    private suspend fun fetchListing(path: String, page: Int): Pair<List<SearchResponse>, Int> {
+        if (page < 1) return emptyList() to 1
+        val sep = if (path.contains("?")) "&" else "?"
+        val text = runCatching {
+            app.get("$mainUrl$path${sep}page=$page", headers = xhrHeaders).text
+        }.getOrDefault("{}")
+        val lastPage = runCatching {
+            JSONObject(text).optJSONObject("pagination")?.optInt("last_page", 1) ?: 1
+        }.getOrDefault(1)
+        return parseVideoArray(text) to lastPage
     }
 
     private suspend fun parseHtmlListing(path: String): List<SearchResponse> {
@@ -112,26 +172,32 @@ class StardimaProvider : MainAPI() {
         return results.distinctBy { it.url }
     }
 
+    private suspend fun loadCategoriesPage(page: Int): HomePageResponse {
+        val index = page - 1
+        val remaining = if (index < 0) emptyList() else categorySlugs.drop(index)
+        if (remaining.isEmpty()) {
+            return newHomePageResponse(listOf(HomePageList("التصنيفات", emptyList())), hasNext = false)
+        }
+        val slug = remaining.first()
+        val series = runCatching { fetchListing("/mosalsalat?category=$slug", 1).first }
+            .getOrDefault(emptyList())
+        val movies = runCatching { fetchListing("/aflam?category=$slug", 1).first }
+            .getOrDefault(emptyList())
+        val items = if (series.isNotEmpty()) series else movies
+        return newHomePageResponse(listOf(HomePageList("التصنيفات", items)), hasNext = remaining.size > 1)
+    }
+
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
         return when (request.name) {
-            "أفلام" -> newHomePageResponse(listOf(HomePageList("أفلام", parseJsonListing("/aflam", page))))
-            "مسلسلات" -> newHomePageResponse(listOf(HomePageList("مسلسلات", parseJsonListing("/mosalsalat", page))))
+            "آخر ما تمت إضافته" -> {
+                val items = if (page < 2) parseHtmlListing("/newrelases") else emptyList()
+                newHomePageResponse(listOf(HomePageList(request.name, items)), hasNext = false)
+            }
+            "التصنيفات" -> loadCategoriesPage(page)
             else -> {
-                if (page > 1) return newHomePageResponse(emptyList())
-                val home = arrayListOf<HomePageList>()
-                runCatching {
-                    val latest = parseHtmlListing("/newrelases")
-                    if (latest.isNotEmpty()) home.add(HomePageList("آخر ما تمت إضافته", latest))
-                }.onFailure { logError(it) }
-                runCatching {
-                    val movies = parseJsonListing("/aflam", 1)
-                    if (movies.isNotEmpty()) home.add(HomePageList("أفلام", movies))
-                }.onFailure { logError(it) }
-                runCatching {
-                    val series = parseJsonListing("/mosalsalat", 1)
-                    if (series.isNotEmpty()) home.add(HomePageList("مسلسلات", series))
-                }.onFailure { logError(it) }
-                newHomePageResponse(home)
+                val path = request.data.trim().ifBlank { "/aflam" }
+                val (items, lastPage) = fetchListing(path, page)
+                newHomePageResponse(listOf(HomePageList(request.name, items)), hasNext = page < lastPage)
             }
         }
     }

@@ -1,4 +1,4 @@
-version = 1
+version = 2
 
 cloudstream {
     description = "أفلام ومسلسلات عربية وكارتون ومسلسلات تركية مترجمة بجودة عالية"
