@@ -12,5 +12,5 @@ cloudstream {
         "tvTypes"
     )
 
-    iconUrl = "https://web8.topcinema.cam/wp-content/uploads/2023/05/cropped-icon-32x32.png"
+    iconUrl = "https://topcinema.io/wp-content/uploads/2023/05/cropped-icon-192x192.png"
 }

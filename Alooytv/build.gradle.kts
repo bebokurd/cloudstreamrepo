@@ -12,5 +12,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://fitnur.com/uploads/avatars/c5ae8dadf88bcea9549657ec451a1563.jpg"
+    iconUrl = "https://n.alooytv14.xyz/uploads/system_logo/favicon.ico"
 }

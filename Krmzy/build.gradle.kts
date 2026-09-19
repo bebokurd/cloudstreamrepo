@@ -12,5 +12,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwTnAJOvyri3uHzHxjkEdlaBBKs8MAvIuJtFmCoo9u5qYiuFpHZjcl6tDi&s=10"
+    iconUrl = "https://krmzi.org/wp-content/uploads/2026/02/cropped-faviconkrmzi-192x192.png"
 }

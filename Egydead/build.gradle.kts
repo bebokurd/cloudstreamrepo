@@ -14,5 +14,5 @@ cloudstream {
         "AsianDrama"
     )
 
-    iconUrl = "https://yt3.googleusercontent.com/ytc/AIdro_kgVTM6DJtx3tcS4gkPOOPnwFXKNhsrFyMRigWOlWomuQ=s900-c-k-c0x00ffffff-no-rj"
+    iconUrl = "https://tv10.egydead.live/wp-content/uploads/2019/01/cropped-yXYdE2f-192x192.png"
 }

@@ -13,5 +13,5 @@ cloudstream {
         "Drama"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe95deIIAAbyR9ArSievPWdM2QwiVG9bbQ6Y1uDIbRBpathzSs45b8uQ4&s=10"
+    iconUrl = "https://tuniflix.site/wp-content/uploads/2025/01/TUNIFLIX-1-25-2025-2.png"
 }

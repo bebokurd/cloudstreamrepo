@@ -13,5 +13,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://carateen.tv/assets/img/favicons/favicon-32x32.png"
+    iconUrl = "https://carateen.tv/assets/img/favicons/apple-touch-icon.png"
 }

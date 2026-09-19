@@ -12,5 +12,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://cdn.wccftech.com/wp-content/uploads/2018/01/Youtube-music.png"
+    iconUrl = "https://w30.shahidwbas.tv/favicons/android-icon-192x192.png"
 }

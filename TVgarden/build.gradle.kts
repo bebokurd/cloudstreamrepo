@@ -13,5 +13,5 @@ cloudstream {
         "Live"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9Lci-tXtOtWaHcEp9An7bqIkXs4yzH7EcfA&s"
+    iconUrl = "https://famelack.com/favicon-192.png"
 }

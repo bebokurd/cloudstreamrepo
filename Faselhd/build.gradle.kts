@@ -12,5 +12,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ03aoQBNDy_Hkm5MUGGvluPvK7To7BdGiSnzQn7WJ3fQ&s=10"
+    iconUrl = "https://static.faselhdcdn.com/wp-content/themes/faselhd_2020/images/favicon.png"
 }

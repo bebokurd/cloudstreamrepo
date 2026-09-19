@@ -12,5 +12,5 @@ cloudstream {
         "Movie"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQX1z-0NYyzyEiFs4q7X9c8SSBR6kJtVl7f7A&s"
+    iconUrl = "https://w.cimacub.com/wp-content/uploads/2026/08/cropped-cimaclub-238x238.webp"
 }

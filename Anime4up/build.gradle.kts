@@ -13,5 +13,5 @@ cloudstream {
         "Anime"
     )
 
-    iconUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkVDfHjqUpRyrWJjW8wUHH87BhSO6B9uxI-B80sAy_AQ&s=10"
+    iconUrl = "https://w1.anime4up.rest/wp-content/uploads/2019/03/Anime4up-Icon-1.png"
 }
