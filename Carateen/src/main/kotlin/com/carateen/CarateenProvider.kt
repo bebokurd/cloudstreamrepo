@@ -33,6 +33,8 @@ class CarateenProvider : MainAPI() {
         "Accept" to "application/json, text/plain, */*"
     )
 
+    private val playbackHeaders = standardHeaders - "Accept" - "X-Cartoony-Client"
+
     private class SimpleCache<T>(val data: T, val time: Long)
 
     @Volatile
@@ -422,6 +424,7 @@ class CarateenProvider : MainAPI() {
                                 url = link
                             ) {
                                 referer = "$mainUrl/"
+                                headers = playbackHeaders
                                 quality = Qualities.Unknown.value
                                 type = ExtractorLinkType.M3U8
                             }
@@ -443,6 +446,7 @@ class CarateenProvider : MainAPI() {
                                 url = resolved
                             ) {
                                 referer = "$mainUrl/"
+                                headers = playbackHeaders
                                 quality = Qualities.Unknown.value
                                 type = if (isDash) ExtractorLinkType.DASH else ExtractorLinkType.M3U8
                             }
