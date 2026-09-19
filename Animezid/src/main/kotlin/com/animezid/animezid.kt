@@ -8,7 +8,33 @@ import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.net.URLEncoder
+
+@Serializable
+data class SeasonAjax(
+    @SerialName("success") val success: Boolean? = null,
+    @SerialName("html") val html: String? = null
+)
+
+@Serializable
+data class PlaybackSource(
+    @SerialName("provider") val provider: String? = null,
+    @SerialName("type") val type: String? = null,
+    @SerialName("id") val id: String? = null
+)
+
+@Serializable
+data class PlaybackSession(
+    @SerialName("session_id") val sessionId: String? = null,
+    @SerialName("sources") val sources: List<PlaybackSource>? = null
+)
+
+@Serializable
+data class PlaybackResolve(
+    @SerialName("launch_url") val launchUrl: String? = null
+)
 
 class Animezid : MainAPI() {
     override var mainUrl = "https://animezid.cam"
