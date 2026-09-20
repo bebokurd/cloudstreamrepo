@@ -17,7 +17,7 @@ import java.net.URLEncoder
 import java.util.Locale
 
 private const val TAG = "AnimeZid"
-private const val MAX_SERVERS = 5
+private const val MAX_SERVERS = 4
 
 @Serializable
 data class SeasonAjax(
@@ -270,7 +270,7 @@ class Animezid : MainAPI() {
 
             val sourceOrder = listOf(
                 "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
-                "MegaMax", "RPMShare", "UPNShare", "PlayMate", "StreamP2P", "StreamWish"
+                "MegaMax", "RPMShare", "UPNShare"
             )
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
