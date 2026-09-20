@@ -299,7 +299,7 @@ class Animezid : MainAPI() {
                     result = result.merge(postEmbedDl(finalUrl))
                 }
 
-                for ((videoUrl, quality) in result.videos) {
+                for ((videoUrl, videoQuality) in result.videos) {
                     val isM3u8 = videoUrl.contains(".m3u8", ignoreCase = true)
                     callback(
                         newExtractorLink(
@@ -309,14 +309,14 @@ class Animezid : MainAPI() {
                         ) {
                             this.referer = finalUrl
                             type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-                            quality = quality
+                            quality = videoQuality
                         }
                     )
                     emitted++
                 }
                 val subSeen = HashSet<String>()
                 for ((lang, subUrl) in result.subtitles) {
-                    if (subSeen.add(subUrl)) subtitleCallback(SubtitleFile(lang, subUrl))
+                    if (subSeen.add(subUrl)) subtitleCallback(newSubtitleFile(lang, subUrl))
                 }
                 Log.d(TAG, "AnimeZid server '$provider': ${result.videos.size} link(s), ${result.subtitles.size} subtitle(s)")
             }
