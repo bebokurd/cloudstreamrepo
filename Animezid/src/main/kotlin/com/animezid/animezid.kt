@@ -247,10 +247,11 @@ class Animezid : MainAPI() {
 
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
-                .sortedBy { if (it.provider?.contains("TurboViPlay") == true) 0 else 1 }
 
+            var emitted = 0
             for (source in sources) {
                 val sourceId = source.id ?: continue
+                val provider = source.provider ?: continue
                 val resolved = try {
                     parseJson<PlaybackResolve>(
                         app.post(
@@ -264,38 +265,139 @@ class Animezid : MainAPI() {
                 }
                 val launchUrl = resolved.launchUrl ?: continue
 
-                val launchHtml = try {
-                    app.get(launchUrl, headers = baseHeaders(playUrl)).text
+                val launchRes = try {
+                    app.get(launchUrl, headers = baseHeaders(playUrl))
                 } catch (e: Exception) {
                     continue
                 }
+                val finalUrl = launchRes.url ?: launchUrl
+                val page = launchRes.text
 
-                val videoUrl = Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(launchHtml)
-                    ?.groupValues?.get(1)
-                    ?: Regex("var\\s+urlPlay\\s*=\\s*['\"]([^'\"]+)['\"]", RegexOption.IGNORE_CASE).find(launchHtml)
-                        ?.groupValues?.get(1)
-                    ?: Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).find(launchHtml)
-                        ?.groupValues?.get(1)
+                val videoUrls = LinkedHashSet<String>()
+                videoUrls += extractDirectFromPage(page)
+                if (videoUrls.isEmpty() && isEmbedPostHost(finalUrl)) {
+                    videoUrls += postEmbedDl(finalUrl)
+                }
 
-                if (videoUrl != null) {
+                for (videoUrl in videoUrls) {
                     val isM3u8 = videoUrl.contains(".m3u8", ignoreCase = true)
                     callback(
                         newExtractorLink(
                             source = "AnimeZid",
-                            name = source.provider ?: "Server",
+                            name = provider,
                             url = videoUrl,
                         ) {
-                            this.referer = playUrl
+                            this.referer = finalUrl
                             type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                             quality = Qualities.Unknown.value
                         }
                     )
-                    return true
+                    emitted++
                 }
             }
-            false
+            emitted > 0
         } catch (e: Exception) {
             false
+        }
+    }
+
+    private fun extractDirectFromPage(page: String): List<String> {
+        val urls = LinkedHashSet<String>()
+        Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(page)
+            ?.let { urls += it.groupValues[1] }
+        Regex("var\\s+urlPlay\\s*=\\s*['\"]([^'\"]+)['\"]", RegexOption.IGNORE_CASE).find(page)
+            ?.let { urls += it.groupValues[1] }
+        Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).findAll(page)
+            .forEach { urls += it.groupValues[1] }
+        if (urls.isEmpty()) {
+            unpackPacker(page)?.let { decoded ->
+                Regex("""file\s*:\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(decoded)
+                    .forEach { urls += it.groupValues[1] }
+            }
+        }
+        return urls.toList()
+    }
+
+    private fun isEmbedPostHost(url: String): Boolean {
+        val host = getHost(url).lowercase()
+        return host.contains("vidtube") || host.contains("rubyvidhub") || host.contains("streamruby")
+    }
+
+    private suspend fun postEmbedDl(finalUrl: String): List<String> {
+        return try {
+            val host = getHost(finalUrl)
+            val path = finalUrl.substringAfterLast('/').substringBeforeLast('.')
+            val code = path.substringAfterLast('-')
+            if (code.isBlank()) return emptyList()
+            val res = app.post(
+                "https://$host/dl",
+                headers = mutableMapOf(
+                    "User-Agent" to baseHeaders(finalUrl)["User-Agent"].orEmpty(),
+                    "Referer" to finalUrl,
+                    "Origin" to "https://$host",
+                    "X-Requested-With" to "XMLHttpRequest",
+                    "Content-Type" to "application/x-www-form-urlencoded; charset=UTF-8"
+                ),
+                data = mapOf(
+                    "op" to "embed",
+                    "file_code" to code,
+                    "auto" to "1",
+                    "referer" to finalUrl
+                )
+            )
+            val urls = LinkedHashSet<String>()
+            unpackPacker(res.text)?.let { decoded ->
+                Regex("""file\s*:\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(decoded)
+                    .forEach { urls += it.groupValues[1] }
+            }
+            if (urls.isEmpty()) {
+                extractDirectFromPage(res.text).forEach { urls += it }
+            }
+            urls.toList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    private fun unpackPacker(page: String): String? {
+        val match = Regex(
+            """eval\(function\(p,a,c,k,e,d\)\{.*?\}\(\s*(['"])(.*?)\1\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(['"])(.*?)\5\.split""",
+            setOf(RegexOption.DOT_MATCHES_ALL)
+        ).find(page) ?: return null
+        val raw = match.groupValues[2]
+        val aRaw = match.groupValues[3].toIntOrNull() ?: return null
+        val cRaw = match.groupValues[4].toIntOrNull() ?: return null
+        val k = match.groupValues[6].split("|")
+        if (aRaw < 2 || cRaw < 0) return null
+        val a = if (aRaw > 62) 62 else aRaw
+        val p = raw.replace("\\'", "'")
+        val mapping = HashMap<String, String>()
+        for (i in 0 until cRaw) {
+            val key = intToBase(i, a)
+            val value = k.getOrNull(i)
+            if (!value.isNullOrBlank()) mapping[key] = value
+        }
+        return Regex("([0-9A-Za-z]+)").replace(p) { m -> mapping[m.value] ?: m.value }
+    }
+
+    private fun intToBase(num: Int, base: Int): String {
+        val digits = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        if (num == 0) return "0"
+        var n = num
+        val sb = StringBuilder()
+        while (n > 0) {
+            sb.append(digits[n % base])
+            n /= base
+        }
+        return sb.reverse().toString()
+    }
+
+    private fun getHost(url: String): String {
+        return try {
+            val uri = java.net.URI(url)
+            uri.host ?: uri.authority ?: url
+        } catch (e: Exception) {
+            url
         }
     }
 
