@@ -10,7 +10,11 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import android.util.Log
 import java.net.URLEncoder
+import java.util.Locale
+
+private const val TAG = "AnimeZid"
 
 @Serializable
 data class SeasonAjax(
@@ -35,6 +39,19 @@ data class PlaybackSession(
 data class PlaybackResolve(
     @SerialName("launch_url") val launchUrl: String? = null
 )
+
+private data class EmbedResult(
+    val videos: List<Pair<String, Int>> = emptyList(),
+    val subtitles: List<Pair<String, String>> = emptyList()
+) {
+    fun merge(other: EmbedResult): EmbedResult {
+        val videoSeen = HashSet<String>()
+        val subSeen = HashSet<Pair<String, String>>()
+        val allVideos = (videos + other.videos).filter { videoSeen.add(it.first) }
+        val allSubs = (subtitles + other.subtitles).filter { subSeen.add(it) }
+        return EmbedResult(allVideos, allSubs)
+    }
+}
 
 class Animezid : MainAPI() {
     override var mainUrl = "https://animezid.cam"
@@ -273,16 +290,16 @@ class Animezid : MainAPI() {
                 val finalUrl = launchRes.url ?: launchUrl
                 val page = launchRes.text
 
-                val videoUrls = LinkedHashSet<String>()
+                var result = EmbedResult()
                 if (page.trimStart().removePrefix("\uFEFF").startsWith("#EXTM3U")) {
-                    videoUrls += finalUrl
+                    result = result.merge(EmbedResult(listOf(finalUrl to Qualities.Unknown.value)))
                 }
-                videoUrls += extractDirectFromPage(page)
-                if (videoUrls.isEmpty() && isEmbedPostHost(finalUrl)) {
-                    videoUrls += postEmbedDl(finalUrl)
+                result = result.merge(extractDirectFromPage(page))
+                if (result.videos.isEmpty() && isEmbedPostHost(finalUrl)) {
+                    result = result.merge(postEmbedDl(finalUrl))
                 }
 
-                for (videoUrl in videoUrls) {
+                for ((videoUrl, quality) in result.videos) {
                     val isM3u8 = videoUrl.contains(".m3u8", ignoreCase = true)
                     callback(
                         newExtractorLink(
@@ -292,41 +309,92 @@ class Animezid : MainAPI() {
                         ) {
                             this.referer = finalUrl
                             type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-                            quality = Qualities.Unknown.value
+                            quality = quality
                         }
                     )
                     emitted++
                 }
+                val subSeen = HashSet<String>()
+                for ((lang, subUrl) in result.subtitles) {
+                    if (subSeen.add(subUrl)) subtitleCallback(SubtitleFile(lang, subUrl))
+                }
+                Log.d(TAG, "AnimeZid server '$provider': ${result.videos.size} link(s), ${result.subtitles.size} subtitle(s)")
             }
             emitted > 0
         } catch (e: Exception) {
+            Log.e(TAG, "AnimeZid loadLinks failed for $playUrl", e)
             false
         }
     }
 
-    private fun extractDirectFromPage(page: String): List<String> {
-        val urls = LinkedHashSet<String>()
-        Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(page)
-            ?.let { urls += it.groupValues[1] }
-        Regex("var\\s+urlPlay\\s*=\\s*['\"]([^'\"]+)['\"]", RegexOption.IGNORE_CASE).find(page)
-            ?.let { urls += it.groupValues[1] }
-        Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).findAll(page)
-            .forEach { urls += it.groupValues[1] }
-        if (urls.isEmpty()) {
-            val source = unpackPacker(page) ?: return emptyList()
-            captureMediaUrls(source).forEach { urls += it }
+    private fun extractDirectFromPage(page: String): EmbedResult {
+        val videos = LinkedHashSet<Pair<String, Int>>()
+        fun add(url: String, quality: Int = Qualities.Unknown.value) {
+            if (looksLikeVideo(url)) videos += url to quality
         }
-        return urls.toList()
+        Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(page)
+            ?.let { add(it.groupValues[1]) }
+        Regex("var\\s+urlPlay\\s*=\\s*['\"]([^'\"]+)['\"]", RegexOption.IGNORE_CASE).find(page)
+            ?.let { add(it.groupValues[1]) }
+        Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).findAll(page)
+            .forEach { add(it.groupValues[1]) }
+        if (videos.isNotEmpty()) return EmbedResult(videos = videos.toList(), subtitles = extractSubtitles(page))
+        val decoded = unpackPacker(page) ?: return EmbedResult(subtitles = extractSubtitles(page))
+        return parsePackedMedia(decoded).merge(EmbedResult(subtitles = extractSubtitles(page)))
     }
 
-    private fun captureMediaUrls(source: String): List<String> {
-        val out = LinkedHashSet<String>()
-        Regex("""(?:file|src|url)\s*[:=]\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(source)
-            .forEach { match ->
-                val candidate = match.groupValues[1]
-                if (looksLikeVideo(candidate)) out += candidate
+    private fun parsePackedMedia(decoded: String): EmbedResult {
+        val videos = mutableListOf<Pair<String, Int>>()
+        Regex("""\{[^{}]*\}""").findAll(decoded).forEach { obj ->
+            val file = Regex("""file\s*:\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE)
+                .find(obj.value)?.groupValues?.get(1) ?: return@forEach
+            if (!looksLikeVideo(file)) return@forEach
+            val label = Regex("""(?:label|quality)\s*:\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+                .find(obj.value)?.groupValues?.get(1)
+            videos += file to qualityFromLabel(label)
+        }
+        val seen = videos.map { it.first }.toHashSet()
+        Regex("""(?:file|src|url)\s*[:=]\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE)
+            .findAll(decoded).forEach { m ->
+                val candidate = m.groupValues[1]
+                if (candidate !in seen && looksLikeVideo(candidate)) videos += candidate to Qualities.Unknown.value
+            }
+        return EmbedResult(videos = videos, subtitles = extractSubtitles(decoded))
+    }
+
+    private fun extractSubtitles(source: String): List<Pair<String, String>> {
+        val out = LinkedHashSet<Pair<String, String>>()
+        Regex("""tracks\s*:\s*\[(.*?)\]""", setOf(RegexOption.DOT_MATCHES_ALL)).findAll(source)
+            .forEach { block ->
+                Regex("""\{[^{}]*file\s*:\s*["']([^"']+)["'][^{}]*\}""", RegexOption.IGNORE_CASE)
+                    .findAll(block.groupValues[1]).forEach { obj ->
+                        val url = obj.groupValues[1]
+                        if (!url.startsWith("http")) return@forEach
+                        if (!url.contains(".vtt") && !url.contains(".srt") &&
+                            !url.contains("/vtt/") && !url.contains("/srt/")
+                        ) return@forEach
+                        if (url.contains("thumbnails") || url.contains("_sli") || url.contains("empty")) return@forEach
+                        val label = Regex("""(?:label|language|kind)\s*:\s*["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+                            .find(obj.value)?.groupValues?.get(1)
+                        if (label?.lowercase(Locale.ROOT) == "thumbnails") return@forEach
+                        out += (label ?: "Arabic") to url
+                    }
             }
         return out.toList()
+    }
+
+    private fun qualityFromLabel(label: String?): Int {
+        return when (label?.trim()?.lowercase(Locale.ROOT)) {
+            "2160p", "4k", "4k60", "2160" -> Qualities.P2160.value
+            "1440p", "2k", "1440" -> Qualities.P1440.value
+            "1080p", "1080", "fullhd", "full hd", "fhd" -> Qualities.P1080.value
+            "720p", "720", "hd" -> Qualities.P720.value
+            "480p", "480", "sd" -> Qualities.P480.value
+            "360p", "360" -> Qualities.P360.value
+            "240p", "240" -> Qualities.P240.value
+            "144p", "144" -> Qualities.P144.value
+            else -> Qualities.Unknown.value
+        }
     }
 
     private fun looksLikeVideo(url: String): Boolean {
@@ -349,12 +417,12 @@ class Animezid : MainAPI() {
         }
     }
 
-    private suspend fun postEmbedDl(finalUrl: String): List<String> {
+    private suspend fun postEmbedDl(finalUrl: String): EmbedResult {
         return try {
             val host = getHost(finalUrl)
             val path = finalUrl.substringAfterLast('/').substringBeforeLast('.')
             val code = path.substringAfterLast('-')
-            if (code.isBlank()) return emptyList()
+            if (code.isBlank()) return EmbedResult()
             val res = app.post(
                 "https://$host/dl",
                 headers = mutableMapOf(
@@ -371,16 +439,12 @@ class Animezid : MainAPI() {
                     "referer" to finalUrl
                 )
             )
-            val urls = LinkedHashSet<String>()
-            unpackPacker(res.text)?.let { decoded ->
-                captureMediaUrls(decoded).forEach { urls += it }
-            }
-            if (urls.isEmpty()) {
-                extractDirectFromPage(res.text).forEach { urls += it }
-            }
-            urls.toList()
+            val decoded = unpackPacker(res.text)
+            if (decoded != null) parsePackedMedia(decoded)
+            else extractDirectFromPage(res.text)
         } catch (e: Exception) {
-            emptyList()
+            Log.e(TAG, "AnimeZid postEmbedDl failed for $finalUrl", e)
+            EmbedResult()
         }
     }
 
