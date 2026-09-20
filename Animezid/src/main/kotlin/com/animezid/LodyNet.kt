@@ -12,7 +12,7 @@ import java.net.URLEncoder
 import java.util.Locale
 
 private const val LODY_TAG = "LodyNet"
-private const val LODY_MAX_SERVERS = 5
+private const val LODY_MAX_SERVERS = 4
 
 @Serializable
 private data class LodyPlaybackSource(
@@ -254,7 +254,7 @@ class LodyNet : MainAPI() {
 
             val sourceOrder = listOf(
                 "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
-                "MegaMax", "RPMShare", "UPNShare", "PlayMate", "StreamP2P"
+                "MegaMax", "RPMShare", "UPNShare"
             )
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
