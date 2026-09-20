@@ -274,6 +274,9 @@ class Animezid : MainAPI() {
                 val page = launchRes.text
 
                 val videoUrls = LinkedHashSet<String>()
+                if (page.trimStart().removePrefix("\uFEFF").startsWith("#EXTM3U")) {
+                    videoUrls += finalUrl
+                }
                 videoUrls += extractDirectFromPage(page)
                 if (videoUrls.isEmpty() && isEmbedPostHost(finalUrl)) {
                     videoUrls += postEmbedDl(finalUrl)
@@ -320,7 +323,15 @@ class Animezid : MainAPI() {
 
     private fun isEmbedPostHost(url: String): Boolean {
         val host = getHost(url).lowercase()
-        return host.contains("vidtube") || host.contains("rubyvidhub") || host.contains("streamruby")
+        if (host.contains("vidtube") || host.contains("rubyvidhub") ||
+            host.contains("streamruby") || host.contains("playmogo")
+        ) return true
+        return try {
+            val path = java.net.URI(url).path.orEmpty()
+            path.startsWith("/e/") || path.startsWith("/embed/")
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private suspend fun postEmbedDl(finalUrl: String): List<String> {
