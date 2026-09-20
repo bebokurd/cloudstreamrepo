@@ -17,7 +17,7 @@ import java.net.URLEncoder
 import java.util.Locale
 
 private const val TAG = "AnimeZid"
-private const val MAX_SERVERS = 4
+private const val MAX_SERVERS = 16
 
 @Serializable
 data class SeasonAjax(
@@ -40,7 +40,8 @@ data class PlaybackSession(
 
 @Serializable
 data class PlaybackResolve(
-    @SerialName("launch_url") val launchUrl: String? = null
+    @SerialName("launch_url") val launchUrl: String? = null,
+    @SerialName("resolve_url") val resolveUrl: String? = null
 )
 
 private data class EmbedResult(
@@ -270,7 +271,7 @@ class Animezid : MainAPI() {
 
             val sourceOrder = listOf(
                 "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
-                "MegaMax", "RPMShare", "UPNShare"
+                "MegaMax", "PlayMate", "StreamP2P", "RPMShare", "UPNShare"
             )
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
@@ -297,7 +298,7 @@ class Animezid : MainAPI() {
                     Log.w(TAG, "AnimeZid resolve failed for '$provider'", e)
                     continue
                 }
-                val launchUrl = resolved.launchUrl ?: continue
+                val launchUrl = resolved.launchUrl ?: resolved.resolveUrl ?: continue
                 resolvedCount++
 
                 val launchRes = try {

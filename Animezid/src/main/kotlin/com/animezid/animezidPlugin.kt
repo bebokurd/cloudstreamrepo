@@ -9,5 +9,6 @@ class AnimezidPlugin : Plugin() {
     override fun load(context: Context) {
         registerMainAPI(Animezid())
         registerMainAPI(LodyNet())
+        registerExtractorAPI(AnimeZidExtractor())
     }
 }
