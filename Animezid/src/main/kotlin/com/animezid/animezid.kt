@@ -295,8 +295,12 @@ class Animezid : MainAPI() {
                     result = result.merge(EmbedResult(listOf(finalUrl to Qualities.Unknown.value)))
                 }
                 result = result.merge(extractDirectFromPage(page))
-                if (result.videos.isEmpty() && isEmbedPostHost(finalUrl)) {
-                    result = result.merge(postEmbedDl(finalUrl))
+                if (result.videos.isEmpty()) {
+                    if (isDoodHost(finalUrl)) {
+                        result = result.merge(extractDood(finalUrl, page))
+                    } else if (isEmbedPostHost(finalUrl)) {
+                        result = result.merge(postEmbedDl(finalUrl))
+                    }
                 }
 
                 for ((videoUrl, videoQuality) in result.videos) {
@@ -414,6 +418,34 @@ class Animezid : MainAPI() {
             path.startsWith("/e/") || path.startsWith("/embed/")
         } catch (e: Exception) {
             false
+        }
+    }
+
+    private fun isDoodHost(url: String): Boolean {
+        return getHost(url).lowercase().contains("dood")
+    }
+
+    private suspend fun extractDood(finalUrl: String, page: String): EmbedResult {
+        return try {
+            val host = getHost(finalUrl)
+            val match = Regex("""/pass_md5/([a-zA-Z0-9]+)/(\d+)""").find(page) ?: return EmbedResult()
+            val md5 = match.groupValues[1]
+            val ts = match.groupValues[2]
+            val json = app.get(
+                "https://$host/pass_md5/$md5/$ts",
+                headers = mutableMapOf(
+                    "User-Agent" to userAgent,
+                    "Referer" to finalUrl,
+                    "X-Requested-With" to "XMLHttpRequest",
+                    "Accept" to "application/json"
+                )
+            ).text
+            val token = Regex(""""token"\s*:\s*"([^"]+)""").find(json)?.groupValues?.get(1)
+            if (token.isNullOrBlank()) return EmbedResult()
+            EmbedResult(videos = listOf("https://$host/$token" to Qualities.Unknown.value))
+        } catch (e: Exception) {
+            Log.e(TAG, "AnimeZid dood extract failed for $finalUrl", e)
+            EmbedResult()
         }
     }
 
