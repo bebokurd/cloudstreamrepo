@@ -15,6 +15,7 @@ import java.net.URLEncoder
 import java.util.Locale
 
 private const val TAG = "AnimeZid"
+private const val MAX_SERVERS = 5
 
 @Serializable
 data class SeasonAjax(
@@ -262,10 +263,20 @@ class Animezid : MainAPI() {
             val session = parseJson<PlaybackSession>(sessionJson)
             val sessionId = session.sessionId ?: return false
 
+            val sourceOrder = listOf(
+                "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
+                "MegaMax", "RPMShare", "UPNShare", "PlayMate", "StreamP2P", "StreamWish"
+            )
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
+                .sortedBy { src ->
+                    val idx = sourceOrder.indexOf(src.provider)
+                    if (idx < 0) Int.MAX_VALUE / 2 else idx
+                }
+                .take(MAX_SERVERS)
 
             var emitted = 0
+            var resolvedCount = 0
             for (source in sources) {
                 val sourceId = source.id ?: continue
                 val provider = source.provider ?: continue
@@ -278,17 +289,30 @@ class Animezid : MainAPI() {
                         ).text
                     )
                 } catch (e: Exception) {
+                    Log.w(TAG, "AnimeZid resolve failed for '$provider'", e)
                     continue
                 }
                 val launchUrl = resolved.launchUrl ?: continue
+                resolvedCount++
 
                 val launchRes = try {
-                    app.get(launchUrl, headers = baseHeaders(playUrl))
+                    app.get(launchUrl, headers = baseHeaders(playUrl), allowRedirects = false)
                 } catch (e: Exception) {
                     continue
                 }
-                val finalUrl = launchRes.url ?: launchUrl
-                val page = launchRes.text
+                var finalUrl = launchRes.url ?: launchUrl
+                var page = launchRes.text
+                val location = launchRes.headers["Location"] ?: launchRes.headers["location"]
+                if (location != null) {
+                    val target = if (location.startsWith("http")) location else "$mainUrl$location"
+                    val redirected = try {
+                        app.get(target, headers = baseHeaders(target))
+                    } catch (e: Exception) {
+                        continue
+                    }
+                    finalUrl = redirected.url ?: target
+                    page = redirected.text
+                }
 
                 var result = EmbedResult()
                 if (page.trimStart().removePrefix("\uFEFF").startsWith("#EXTM3U")) {
@@ -324,6 +348,7 @@ class Animezid : MainAPI() {
                 }
                 Log.d(TAG, "AnimeZid server '$provider': ${result.videos.size} link(s), ${result.subtitles.size} subtitle(s)")
             }
+            Log.d(TAG, "AnimeZid finished: $resolvedCount server(s) resolved, $emitted link(s) emitted")
             emitted > 0
         } catch (e: Exception) {
             Log.e(TAG, "AnimeZid loadLinks failed for $playUrl", e)
