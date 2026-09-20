@@ -5,6 +5,8 @@ import com.lagradost.cloudstream3.utils.AppUtils.parseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
+import com.lagradost.cloudstream3.utils.getQualityFromName
+import com.lagradost.cloudstream3.utils.loadExtractor
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -254,6 +256,9 @@ class Animezid : MainAPI() {
             val playDoc = app.get(playUrl, headers = baseHeaders(playUrl)).document
             val csrf = playDoc.selectFirst("[data-playback-csrf]")?.attr("data-playback-csrf")
             if (csrf.isNullOrBlank()) return false
+            val tokenVidlo = Regex(""""TokenVidlo"\s*:\s*"([^"]+)"""").find(playDoc.html())
+                ?.groupValues?.get(1).orEmpty()
+            val safePlayUrl = encodeUri(playUrl)
 
             val sessionJson = app.post(
                 "$mainUrl/web-playback/sessions",
@@ -342,6 +347,40 @@ class Animezid : MainAPI() {
                     )
                     emitted++
                 }
+                if (result.videos.isEmpty()) {
+                    val before = emitted
+                    try {
+                        loadExtractor(finalUrl, safePlayUrl, subtitleCallback) { link ->
+                            callback(link)
+                            emitted++
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "AnimeZid loadExtractor failed for '$provider'", e)
+                    }
+                    if (emitted == before) {
+                        try {
+                            SmartPlayer.extract(
+                                playerUrl = finalUrl,
+                                referer = safePlayUrl,
+                                qualityInt = Qualities.Unknown.value,
+                                displayName = "AnimeZid - $provider",
+                                callback = { link ->
+                                    callback(link)
+                                    emitted++
+                                }
+                            )
+                        } catch (e: Exception) {
+                            Log.w(TAG, "AnimeZid SmartPlayer failed for '$provider'", e)
+                        }
+                    }
+                    if (emitted == before && (
+                            provider.contains("vidlo", ignoreCase = true) ||
+                                finalUrl.contains("vidlo", ignoreCase = true)
+                            )
+                    ) {
+                        emitted += extractVidlo(finalUrl, tokenVidlo, callback)
+                    }
+                }
                 val subSeen = HashSet<String>()
                 for ((lang, subUrl) in result.subtitles) {
                     if (subSeen.add(subUrl)) subtitleCallback(newSubtitleFile(lang, subUrl))
@@ -353,6 +392,69 @@ class Animezid : MainAPI() {
         } catch (e: Exception) {
             Log.e(TAG, "AnimeZid loadLinks failed for $playUrl", e)
             false
+        }
+    }
+
+    private suspend fun extractVidlo(
+        embedUrl: String,
+        tokenVidlo: String,
+        callback: (ExtractorLink) -> Unit
+    ): Int {
+        return try {
+            val vidloUrlWithToken = if (tokenVidlo.isNotEmpty()) {
+                if (embedUrl.contains("?")) "$embedUrl&${tokenVidlo.removePrefix("?")}"
+                else "$embedUrl$tokenVidlo"
+            } else {
+                embedUrl
+            }
+            val vidloRes = app.get(
+                vidloUrlWithToken,
+                headers = mapOf(
+                    "User-Agent" to userAgent,
+                    "Referer" to "$mainUrl/",
+                    "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+                )
+            ).text
+            val sourcesMatch = Regex("""sources\s*:\s*\[(.*?)\]""", setOf(RegexOption.DOT_MATCHES_ALL))
+                .find(vidloRes) ?: return 0
+            val sources = sourcesMatch.groupValues[1]
+            val files = Regex("""file\s*:\s*"([^"]+)"""").findAll(sources).map { it.groupValues[1] }.toList()
+            val labels = Regex("""label\s*:\s*"([^"]+)"""").findAll(sources).map { it.groupValues[1] }.toList()
+            var count = 0
+            var qualityIndex = 0
+            for (file in files) {
+                if (file.endsWith(".m3u8")) {
+                    callback(
+                        newExtractorLink(
+                            source = "AnimeZid",
+                            name = "Vidlo HLS",
+                            url = file,
+                        ) {
+                            referer = "$mainUrl/"
+                            quality = Qualities.Unknown.value
+                        }
+                    )
+                    count++
+                } else {
+                    val label = if (qualityIndex < labels.size) labels[qualityIndex] else "Unknown"
+                    callback(
+                        newExtractorLink(
+                            source = "AnimeZid",
+                            name = "Vidlo $label",
+                            url = file,
+                        ) {
+                            referer = "$mainUrl/"
+                            quality = getQualityFromName(label)
+                        }
+                    )
+                    qualityIndex++
+                    count++
+                }
+            }
+            count
+        } catch (e: Exception) {
+            Log.e(TAG, "AnimeZid vidlo extract failed for $embedUrl", e)
+            0
         }
     }
 
