@@ -313,12 +313,27 @@ class Animezid : MainAPI() {
         Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).findAll(page)
             .forEach { urls += it.groupValues[1] }
         if (urls.isEmpty()) {
-            unpackPacker(page)?.let { decoded ->
-                Regex("""file\s*:\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(decoded)
-                    .forEach { urls += it.groupValues[1] }
-            }
+            val source = unpackPacker(page) ?: return emptyList()
+            captureMediaUrls(source).forEach { urls += it }
         }
         return urls.toList()
+    }
+
+    private fun captureMediaUrls(source: String): List<String> {
+        val out = LinkedHashSet<String>()
+        Regex("""(?:file|src|url)\s*[:=]\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(source)
+            .forEach { match ->
+                val candidate = match.groupValues[1]
+                if (looksLikeVideo(candidate)) out += candidate
+            }
+        return out.toList()
+    }
+
+    private fun looksLikeVideo(url: String): Boolean {
+        val lower = url.lowercase()
+        if (Regex(""".\.(?:jpg|jpeg|png|gif|svg|vtt|srt|css|js|ico|xml|woff2?|json|txt)$""").containsMatchIn(lower)) return false
+        return lower.contains(".m3u8") || lower.contains(".mp4") ||
+            (lower.contains("token=") && lower.contains("expiry="))
     }
 
     private fun isEmbedPostHost(url: String): Boolean {
@@ -358,8 +373,7 @@ class Animezid : MainAPI() {
             )
             val urls = LinkedHashSet<String>()
             unpackPacker(res.text)?.let { decoded ->
-                Regex("""file\s*:\s*["'](https?://[^"']+)["']""", RegexOption.IGNORE_CASE).findAll(decoded)
-                    .forEach { urls += it.groupValues[1] }
+                captureMediaUrls(decoded).forEach { urls += it }
             }
             if (urls.isEmpty()) {
                 extractDirectFromPage(res.text).forEach { urls += it }
