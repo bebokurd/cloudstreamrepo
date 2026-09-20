@@ -270,20 +270,23 @@ class Animezid : MainAPI() {
                     continue
                 }
 
-                val m3u8 = Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(launchHtml)
+                val videoUrl = Regex("data-hash=\"([^\"]+\\.m3u8[^\"]*)\"", RegexOption.IGNORE_CASE).find(launchHtml)
                     ?.groupValues?.get(1)
-                    ?: Regex("(https?://[^\\s\"'<>]+\\.m3u8[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).find(launchHtml)
+                    ?: Regex("var\\s+urlPlay\\s*=\\s*['\"]([^'\"]+)['\"]", RegexOption.IGNORE_CASE).find(launchHtml)
+                        ?.groupValues?.get(1)
+                    ?: Regex("(https?://[^\\s\"'<>]+\\.(?:m3u8|mp4)[^\\s\"'<>]*)", RegexOption.IGNORE_CASE).find(launchHtml)
                         ?.groupValues?.get(1)
 
-                if (m3u8 != null) {
+                if (videoUrl != null) {
+                    val isM3u8 = videoUrl.contains(".m3u8", ignoreCase = true)
                     callback(
                         newExtractorLink(
                             source = "AnimeZid",
                             name = source.provider ?: "Server",
-                            url = m3u8,
+                            url = videoUrl,
                         ) {
                             this.referer = playUrl
-                            type = ExtractorLinkType.M3U8
+                            type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                             quality = Qualities.Unknown.value
                         }
                     )
