@@ -199,7 +199,7 @@ class Animezid : MainAPI() {
         val titleRaw = doc.selectFirst("h1")?.text() ?: doc.title().ifBlank { "Unknown" }
         val isAnime = titleRaw.contains("أنمي") || titleRaw.contains("انمي")
         val type = if (isAnime) TvType.AnimeMovie else TvType.Movie
-        return newMovieLoadResponse(cleanTitle(titleRaw), url, type) {
+        return newMovieLoadResponse(cleanTitle(titleRaw), url, type, url) {
             this.posterUrl = getPoster(doc)
             this.plot = getDescription(doc)
             this.year = Regex("(19\\d{2}|20\\d{2})").find(titleRaw)?.groupValues?.get(1)?.toIntOrNull()
@@ -240,7 +240,7 @@ class Animezid : MainAPI() {
             val sessionJson = app.post(
                 "$mainUrl/web-playback/sessions",
                 headers = playbackHeaders(playUrl, csrf),
-                postData = """{"content_id":"$vid"}"""
+                json = mapOf("content_id" to vid)
             ).text
             val session = parseJson<PlaybackSession>(sessionJson)
             val sessionId = session.sessionId ?: return false
@@ -256,7 +256,7 @@ class Animezid : MainAPI() {
                         app.post(
                             "$mainUrl/web-playback/sessions/$sessionId/sources/$sourceId/resolve",
                             headers = playbackHeaders(playUrl, csrf),
-                            postData = "{}"
+                            json = mapOf<String, Any>()
                         ).text
                     )
                 } catch (e: Exception) {
