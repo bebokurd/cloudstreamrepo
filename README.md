@@ -8,7 +8,7 @@ _All Arabic & Kurdish content, in one repository._
 
 <br>
 
-![Plugins](https://img.shields.io/badge/Plugins-41-00c3ff?style=for-the-badge)
+![Plugins](https://img.shields.io/badge/Plugins-42-00c3ff?style=for-the-badge)
 ![Streaming](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=for-the-badge)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3+-00c3ff?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/bebokurd/cloudstreamrepo?style=for-the-badge&color=00c3ff)
@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |---|---|---|
-| 🎬 **41 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
+| 🎬 **42 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
 | ⚡ **Lightweight** — `.cs3` files | 🔍 **Deep search** across all sources | 🖥️ **Android TV** — short codes |
 
 ---
@@ -82,6 +82,7 @@ Kurdish video platform: movies & series in **DASH / HLS**, fully integrated with
 | <img width="40" height="40" src="https://animezid.cam/templates/az-modern/assets/img/animezid-header-dark-v4.png"> | **Animezid** | مشاهدة وتحميل الأنمي والكرتون والأفلام مترجمة ومدبلجة بجودة عالية |
 | <img width="40" height="40" src="https://amd.brstej.com/22.png"> | **Bristege** | مشاهدة الأنمي المترجم بالعربية |
 | <img width="40" height="40" src="https://carateen.tv/assets/img/favicons/apple-touch-icon.png"> | **Carateen** | مسلسلات وأفلام الكرتون العربية وسبيستون بجودة عالية |
+| <img width="40" height="40" src="https://cartoontime.net/wp-content/uploads/2026/05/cropped-icon1-192x192.jpg"> | **CartoonTime** | مشاهدة وتحميل افلام الكرتون وكرتون ديزني مدبلج مجانا |
 | <img width="40" height="40" src="https://cee.buzz/favicon.ico"> | **Cee** | لا يعمل خارج العراق |
 | <img width="40" height="40" src="https://w.cimacub.com/wp-content/uploads/2026/08/cropped-cimaclub-238x238.webp"> | **CimaClub** | سيرفرات الموقع بها ضعف احيانا اذا لم يفتح غالبا المشكلة من الموقع |
 | <img width="40" height="40" src="https://e.cimalight.co/favicons/android-icon-192x192.png"> | **Cimalight** | مشاهدة الأفلام والمسلسلات مترجمة ومدبلجة |
