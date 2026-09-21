@@ -271,7 +271,7 @@ class Animezid : MainAPI() {
 
             val sourceOrder = listOf(
                 "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
-                "MegaMax", "PlayMate", "StreamP2P", "RPMShare", "UPNShare"
+                "MegaMax", "Nuvio", "PlayMate", "StreamP2P", "RPMShare", "UPNShare"
             )
             val sources = (session.sources ?: emptyList())
                 .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
