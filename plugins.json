@@ -234,30 +234,6 @@
         "fileHash": "sha256-4c639f9392d46e45f4ee84e8799c810cc1d11fba2f13ff7e32865c71987c2fb4"
     },
     {
-        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Animezid.cs3",
-        "status": 1,
-        "version": 1,
-        "name": "Animezid",
-        "internalName": "Animezid",
-        "authors": [
-            "bebokurd"
-        ],
-        "description": "┘à╪┤╪º┘ç╪»╪⌐ ┘ê╪¬╪¡┘à┘è┘ä ╪º┘ä╪ú┘å┘à┘è ┘ê╪º┘ä┘â╪▒╪¬┘ê┘å ┘ê╪º┘ä╪ú┘ü┘ä╪º┘à ┘à╪¬╪▒╪¼┘à╪⌐ ┘ê┘à╪»╪¿┘ä╪¼╪⌐ ╪¿╪¼┘ê╪»╪⌐ ╪╣╪º┘ä┘è╪⌐",
-        "fileSize": 64110,
-        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
-        "language": "ar",
-        "tvTypes": [
-            "Anime",
-            "AnimeMovie",
-            "Movie",
-            "TvSeries",
-            "Cartoon"
-        ],
-        "iconUrl": "https://animezid.cam/templates/az-modern/assets/img/animezid-header-dark-v4.png",
-        "apiVersion": 1,
-        "fileHash": "sha256-f6be4d3cc6d5613c29b58efe3fc13f367e3f7fdc8e1583952db4335953d65af9"
-    },
-    {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Bristege.cs3",
         "status": 1,
         "version": 1,

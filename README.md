@@ -79,7 +79,6 @@ Kurdish video platform: movies & series in **DASH / HLS**, fully integrated with
 | <img width="40" height="40" src="https://raw.githubusercontent.com/Abodabodd/Oldarabrepo/refs/heads/main/img/file_0000000042f861f49090744dc097ee2f.png"> | **Animerco** | مشاهدة الأنمي المترجم والمدبلج بالعربية |
 | <img width="40" height="40" src="https://raw.githubusercontent.com/Abodabodd/re-3arabi/refs/heads/main/AnimeRift/icon.png"> | **AnimeRift** | ⚠️ تنبيه: يُرجى استخدام VPN لتجنب حظر عنوان الـ IP الخاص بك |
 | <img width="40" height="40" src="https://raw.githubusercontent.com/Abodabodd/Oldarabrepo/refs/heads/main/img/anime_witcher_round_icon.png"> | **Animewitcher** | مشاهدة الأنمي المترجم والمدبلج بالعربية |
-| <img width="40" height="40" src="https://animezid.cam/templates/az-modern/assets/img/animezid-header-dark-v4.png"> | **Animezid** | مشاهدة وتحميل الأنمي والكرتون والأفلام مترجمة ومدبلجة بجودة عالية |
 | <img width="40" height="40" src="https://amd.brstej.com/22.png"> | **Bristege** | مشاهدة الأنمي المترجم بالعربية |
 | <img width="40" height="40" src="https://carateen.tv/assets/img/favicons/apple-touch-icon.png"> | **Carateen** | مسلسلات وأفلام الكرتون العربية وسبيستون بجودة عالية |
 | <img width="40" height="40" src="https://cartoontime.net/wp-content/uploads/2026/05/cropped-icon1-192x192.jpg"> | **CartoonTime** | مشاهدة وتحميل افلام الكرتون وكرتون ديزني مدبلج مجانا |
