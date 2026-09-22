@@ -8,7 +8,7 @@ _All Arabic & Kurdish content, in one repository._
 
 <br>
 
-![Plugins](https://img.shields.io/badge/Plugins-43-00c3ff?style=for-the-badge)
+![Plugins](https://img.shields.io/badge/Plugins-44-00c3ff?style=for-the-badge)
 ![Streaming](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=for-the-badge)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3+-00c3ff?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/bebokurd/cloudstreamrepo?style=for-the-badge&color=00c3ff)
@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |---|---|---|
-| 🎬 **43 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
+| 🎬 **44 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
 | ⚡ **Lightweight** — `.cs3` files | 🔍 **Deep search** across all sources | 🖥️ **Android TV** — short codes |
 
 ---
@@ -93,6 +93,7 @@ Kurdish video platform: movies & series in **DASH / HLS**, fully integrated with
 | <img width="40" height="40" src="https://gesseh.net/wp-content/uploads/2024/10/keesatlogo.png"> | **eseek** | مشاهدة وتحميل الأفلام والمسلسلات العربية مجانا |
 | <img width="40" height="40" src="https://static.faselhdcdn.com/wp-content/themes/faselhd_2020/images/favicon.png"> | **Faselhd** | أفلام ومسلسلات بجودات وسيرفرات متعددة |
 | <img width="40" height="40" src="https://krmzi.org/wp-content/uploads/2026/02/cropped-faviconkrmzi-192x192.png"> | **Krmzy** | البحث لا يعمل حاليا مشكلة من الموقع |
+| <img width="40" height="40" src="https://kurdora.com/icon-512.png"> | **Kurdora** | کوردۆرا - پلاتفۆرمی ڤیدیۆی کوردی (فیلم و زنجیرە) |
 | <img width="40" height="40" src="https://lodynet.watch/wp-content/themes/Lodynet2020/Img/Logo.webp"> | **Lodynet** | مشاهدة الأفلام والمسلسلات مترجمة ومدبلجة |
 | <img width="40" height="40" src="https://mycima.bike/wp-content/uploads/2025/10/cropped-cropped-mycima-192x192.png"> | **MyCimaProvider** | مشاهدة أحدث الأفلام والمسلسلات العالمية مترجمة |
 | <img width="40" height="40" src="https://ok.ru/img/favicon.ico"> | **Ok.ru** | مشاهدة فيديوهات Ok.ru - أفلام وفيديوهات |

@@ -512,6 +512,26 @@
         "fileHash": "sha256-785b7fc9326398763dd7343b90658e28b5aae1f7ce3fa1de72fc09a67e6b99e6"
     },
     {
+        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Kurdora.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kurdora",
+        "internalName": "Kurdora",
+        "authors": [
+            "Abodabodd"
+        ],
+        "description": "کوردۆرا - پلاتفۆرمی ڤیدیۆی کوردی (فیلم و زنجیرە)",
+        "fileSize": 0,
+        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
+        "language": "ar",
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "iconUrl": "https://kurdora.com/icon-512.png",
+        "apiVersion": 1
+    },
+    {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Lodynet.cs3",
         "status": 1,
         "version": 2,
