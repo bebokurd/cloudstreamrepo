@@ -491,6 +491,28 @@
         "fileHash": "sha256-ffdcb7efc760f82032f2d2822a8c1e985e0bba8e763be3925b2884a9b6a81de9"
     },
     {
+        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Kartonikurde.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kartonikurde",
+        "internalName": "Kartonikurde",
+        "authors": [
+            "Abodabodd"
+        ],
+        "description": "کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی",
+        "fileSize": 18111,
+        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
+        "language": "ar",
+        "tvTypes": [
+            "TvSeries",
+            "Cartoon",
+            "Movie"
+        ],
+        "iconUrl": "https://www.kartonikurde.com/icon/favicon-32x32.png",
+        "apiVersion": 1,
+        "fileHash": "sha256-9265e653b1b4da2db61c7297ad92905e65a84b92184c71503c26c6fe3c3cdfc9"
+    },
+    {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Krmzy.cs3",
         "status": 1,
         "version": 1,

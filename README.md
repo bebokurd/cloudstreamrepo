@@ -16,7 +16,7 @@
 https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json
 ```
 
-![Plugins](https://img.shields.io/badge/Plugins-45-00c3ff?style=flat-square)
+![Plugins](https://img.shields.io/badge/Plugins-46-00c3ff?style=flat-square)
 ![Formats](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=flat-square)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3%2B-00c3ff?style=flat-square)
 ![Languages](https://img.shields.io/badge/Languages-Arabic%20%C2%B7%20Kurdish-00ff9d?style=flat-square)
@@ -33,7 +33,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |:-:|:-:|:-:|
-| 🎬 **45 plugins**<br>Arabic & Kurdish sources | 📡 **Native streaming**<br>DASH / HLS playback | 🟣 **Kurdish content**<br>Rashaba · Kurdora · Kurdbin |
+| 🎬 **46 plugins**<br>Arabic & Kurdish sources | 📡 **Native streaming**<br>DASH / HLS playback | 🟣 **Kurdish content**<br>Rashaba · Kurdora · Kurdbin · Kartonikurde |
 | ⚡ **Lightweight**<br>Tiny `.cs3` plugins | 🔍 **Deep search**<br>Across every source | 🖥️ **Android TV**<br>Short codes included |
 
 ---
@@ -61,18 +61,19 @@ Typing a URL with a remote is painful — type one of these instead:
 ---
 <br>
 
-## 📦 Plugins — 45
+## 📦 Plugins — 46
 
 > Type legend: 🎬 Movie · 🍿 Series · 🎌 Anime · 🧸 Cartoon · 📡 Live TV · ⚽ Sports · ▶️ Video
 >
 > Status: ✔️ Works · ⚠️ Known issues (see notes)
 
-### <span style="color:#7a5cff">🟣 Kurdish · کوردی</span> — 3
+### <span style="color:#7a5cff">🟣 Kurdish · کوردی</span> — 4
 
 Native Kurdish platforms, fully integrated with **CHYA TV**.
 
 | Icon | Plugin | Type | Status | Notes |
 |---|---|---|---|---|
+| <img width="40" height="40" src="https://www.kartonikurde.com/icon/favicon-32x32.png"> | **Kartonikurde** | 🎬🍿🧸 | ✔️ | کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی |
 | <img width="40" height="40" src="https://kurdbin.kurdsat.tv/favicon.ico"> | **Kurdbin** | 🎬 | ✔️ | کوردبین - ڤیدیۆ و فیلم و بەرنامەکانی کوردسات |
 | <img width="40" height="40" src="https://kurdora.com/icon-512.png"> | **Kurdora** | 🎬🍿 | ✔️ | کوردۆرا - پلاتفۆرمی ڤیدیۆی کوردی (فیلم و زنجیرە) |
 | <img width="40" height="40" src="https://rashaba.com/assets/images/logo.png"> | **Rashaba** | 🎬🍿 | ✔️ | رەشەبا - پلاتفۆرمی ڤیدیۆی کوردی |
