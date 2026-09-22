@@ -62,7 +62,7 @@ fun okQualityLabel(name: String?): String = when (name?.trim()?.lowercase()) {
     else -> name?.trim()?.takeIf { it.isNotBlank() } ?: "Video"
 }
 
-fun emitOkLinks(
+suspend fun emitOkLinks(
     source: String,
     player: OkPlayerData,
     referer: String,

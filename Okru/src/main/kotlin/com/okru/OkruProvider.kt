@@ -10,6 +10,7 @@ import com.lagradost.cloudstream3.SearchResponseList
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.app
+import com.lagradost.cloudstream3.fixUrl
 import com.lagradost.cloudstream3.mainPageOf
 import com.lagradost.cloudstream3.newHomePageResponse
 import com.lagradost.cloudstream3.newMovieLoadResponse
@@ -42,14 +43,13 @@ class OkruProvider : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse>? {
-        return search(query, 1)?.list
+        val url = "$mainUrl/video?st.query=${URLEncoder.encode(query, "UTF-8")}"
+        return parseCards(app.get(url).text)
     }
 
     override suspend fun search(query: String, page: Int): SearchResponseList? {
         if (page > 1) return null
-        val url = "$mainUrl/video?st.query=${URLEncoder.encode(query, "UTF-8")}"
-        val cards = parseCards(app.get(url).text)
-        return newSearchResponseList(cards, hasNext = false)
+        return newSearchResponseList(search(query) ?: emptyList(), hasNext = false)
     }
 
     override suspend fun load(url: String): LoadResponse? {
