@@ -101,8 +101,3 @@ class KurdoraStream(
     @JsonProperty("url") val url: String? = null,
     @JsonProperty("isHls") val isHls: Boolean? = null
 )
-
-private const val PLACEHOLDER = "kurdora"
-
-fun KurdoraVideoServer.hasRealUrl(): Boolean =
-    !url.isNullOrBlank() && url != PLACEHOLDER && url.startsWith("http")

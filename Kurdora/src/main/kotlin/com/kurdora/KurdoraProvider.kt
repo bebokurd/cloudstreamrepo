@@ -117,12 +117,26 @@ class KurdoraProvider : MainAPI() {
 
     private suspend fun loadMovieLinks(url: String, callback: (ExtractorLink) -> Unit): Boolean {
         val slug = url.trimEnd('/').substringAfterLast('/')
-        val html = runCatching { app.get("$mainUrl/film/$slug").text }.getOrNull()
-        var servers = html?.let { parseVideoServers(it) } ?: emptyList()
-        if (servers.none { it.hasRealUrl() }) {
-            servers = AppUtils.tryParseJson<KurdoraMovieDetail>(app.get("$apiBase/movies/$slug").text)
-                ?.videoServers.orEmpty()
+        val detail = AppUtils.tryParseJson<KurdoraMovieDetail>(app.get("$apiBase/movies/$slug").text)
+
+        val wasabiId = detail?.id
+        if (wasabiId != null && emitWasabiStreams(wasabiId, callback)) {
+            return true
         }
+
+        if (emitServers(detail?.videoServers.orEmpty(), callback)) {
+            return true
+        }
+
+        val html = runCatching { app.get("$mainUrl/film/$slug").text }.getOrNull()
+        val rscServers = html?.let { parseVideoServers(it) }.orEmpty()
+        if (emitServers(rscServers, callback)) {
+            return true
+        }
+        return false
+    }
+
+    private suspend fun emitServers(servers: List<KurdoraVideoServer>, callback: (ExtractorLink) -> Unit): Boolean {
         var found = false
         servers.forEach { server ->
             val streamUrl = server.url?.takeIf { it.isNotBlank() && it.startsWith("http") } ?: return@forEach
@@ -139,6 +153,32 @@ class KurdoraProvider : MainAPI() {
                     this.quality = getQualityFromName(server.quality)
                 }
             )
+        }
+        return found
+    }
+
+    private suspend fun emitWasabiStreams(mediaId: String, callback: (ExtractorLink) -> Unit): Boolean {
+        val url = "$apiBase/videos/wasabi/movie/$mediaId"
+        val json = AppUtils.tryParseJson<KurdoraWasabiResponse>(app.get(url).text) ?: return false
+        if ((json.totalQualities ?: 0) <= 0) return false
+        var found = false
+        json.streams.orEmpty().forEach { (qualityLabel, streams) ->
+            streams.forEach { stream ->
+                val streamUrl = stream.url?.takeIf { it.isNotBlank() && it.startsWith("http") } ?: return@forEach
+                found = true
+                callback.invoke(
+                    newExtractorLink(
+                        source = name,
+                        name = "Kurdora $qualityLabel",
+                        url = streamUrl,
+                        type = if (stream.isHls == true || streamUrl.contains(".m3u8"))
+                            ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+                    ) {
+                        this.referer = mainUrl
+                        this.quality = getQualityFromName(qualityLabel)
+                    }
+                )
+            }
         }
         return found
     }
