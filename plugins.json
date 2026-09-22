@@ -556,6 +556,25 @@
         "fileHash": "sha256-ff8e09bb07cb94fad7216e8c6a29bdff3d5758e6f7f1c4b68bacad18935bfe5a"
     },
     {
+        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Okru.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Ok.ru",
+        "internalName": "Okru",
+        "authors": [
+            "Abodabodd"
+        ],
+        "description": "مشاهدة فيديوهات Ok.ru - أفلام وفيديوهات",
+        "fileSize": 0,
+        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
+        "language": "ar",
+        "tvTypes": [
+            "Movie"
+        ],
+        "iconUrl": "https://ok.ru/img/favicon.ico",
+        "apiVersion": 1
+    },
+    {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Rashaba.cs3",
         "status": 1,
         "version": 1,
