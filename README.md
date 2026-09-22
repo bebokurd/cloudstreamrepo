@@ -8,7 +8,7 @@ _All Arabic & Kurdish content, in one repository._
 
 <br>
 
-![Plugins](https://img.shields.io/badge/Plugins-42-00c3ff?style=for-the-badge)
+![Plugins](https://img.shields.io/badge/Plugins-43-00c3ff?style=for-the-badge)
 ![Streaming](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=for-the-badge)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3+-00c3ff?style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/bebokurd/cloudstreamrepo?style=for-the-badge&color=00c3ff)
@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |---|---|---|
-| 🎬 **42 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
+| 🎬 **43 Arabic plugins** — movies, series, anime & TV | 📡 **Native streaming** — DASH / HLS | 🟣 **Kurdish** — Rashaba fully integrated |
 | ⚡ **Lightweight** — `.cs3` files | 🔍 **Deep search** across all sources | 🖥️ **Android TV** — short codes |
 
 ---
@@ -95,6 +95,7 @@ Kurdish video platform: movies & series in **DASH / HLS**, fully integrated with
 | <img width="40" height="40" src="https://krmzi.org/wp-content/uploads/2026/02/cropped-faviconkrmzi-192x192.png"> | **Krmzy** | البحث لا يعمل حاليا مشكلة من الموقع |
 | <img width="40" height="40" src="https://lodynet.watch/wp-content/themes/Lodynet2020/Img/Logo.webp"> | **Lodynet** | مشاهدة الأفلام والمسلسلات مترجمة ومدبلجة |
 | <img width="40" height="40" src="https://mycima.bike/wp-content/uploads/2025/10/cropped-cropped-mycima-192x192.png"> | **MyCimaProvider** | مشاهدة أحدث الأفلام والمسلسلات العالمية مترجمة |
+| <img width="40" height="40" src="https://ok.ru/img/favicon.ico"> | **Ok.ru** | مشاهدة فيديوهات Ok.ru - أفلام وفيديوهات |
 | <img width="40" height="40" src="https://rashaba.com/assets/images/logo.png"> | **Rashaba** | رەشەبا - پلاتفۆرمی ڤیدیۆی کوردی |
 | <img width="40" height="40" src="https://fullmatchshows.com/wp-content/uploads/2024/04/LOGOSASO.png"> | **Replaymatch** | Watch football and sports matches with full replays |
 | <img width="40" height="40" src="https://w30.shahidwbas.tv/favicons/android-icon-192x192.png"> | **Shahidwbas** | مشاهدة الأفلام والمسلسلات العربية مجانا |
