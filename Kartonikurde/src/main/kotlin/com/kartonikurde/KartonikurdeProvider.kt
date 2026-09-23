@@ -19,9 +19,16 @@ class KartonikurdeProvider : MainAPI() {
     override var lang = "ar"
     override val hasMainPage = true
     override val hasQuickSearch = true
-    override val supportedTypes = setOf(TvType.Movie, TvType.Cartoon)
+    override val supportedTypes = setOf(TvType.Movie, TvType.Cartoon, TvType.Live)
+
+    private val broadcastServers = listOf(
+        "https://vidmoly.org/embed-zd7ymvfj17ul.html" to "Server 1",
+        "https://player.abyssplayer.com/m6WUkwsY9" to "Server 2",
+        "https://morencius.com/embed/k6b5ubdcpj5" to "Server 3"
+    )
 
     override val mainPage = mainPageOf(
+        "broadcast" to "پەخشی ڕاستەوخۆ",
         "$mainUrl/movies" to "فیلم",
         "$mainUrl/subtitle-movies" to "فیلمی وەرگێڕدراو",
         "$mainUrl/series" to "زنجیرە",
@@ -29,11 +36,24 @@ class KartonikurdeProvider : MainAPI() {
     )
 
     override suspend fun getMainPage(page: Int, request: MainPageRequest): HomePageResponse {
-        val url = request.data ?: return newHomePageResponse(request.name ?: name, emptyList())
-        if (page > 1) return newHomePageResponse(request.name ?: name, emptyList(), hasNext = false)
+        val sectionName = request.name ?: name
+        if (request.data == "broadcast") {
+            if (page > 1) return newHomePageResponse(sectionName, emptyList(), hasNext = false)
+            val items = broadcastServers.map { (url, serverName) ->
+                newMovieSearchResponse(serverName, "broadcast://$url", TvType.Live) {
+                    this.posterUrl = null
+                }
+            }
+            return newHomePageResponse(
+                listOf(HomePageList(sectionName, items)),
+                hasNext = false
+            )
+        }
+        val url = request.data ?: return newHomePageResponse(sectionName, emptyList())
+        if (page > 1) return newHomePageResponse(sectionName, emptyList(), hasNext = false)
         val html = runCatching { app.get(url).text }.getOrNull().orEmpty()
         return newHomePageResponse(
-            listOf(HomePageList(request.name ?: name, parseCards(html))),
+            listOf(HomePageList(sectionName, parseCards(html))),
             hasNext = false
         )
     }
@@ -91,6 +111,17 @@ class KartonikurdeProvider : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val pageUrl = url.trim()
+
+        // Handle broadcast URLs
+        if (pageUrl.startsWith("broadcast://")) {
+            val embedUrl = pageUrl.removePrefix("broadcast://")
+            val serverName = broadcastServers.firstOrNull { it.first == embedUrl }?.second
+                ?: "پەخشی ڕاستەوخۆ"
+            return newMovieLoadResponse(serverName, pageUrl, TvType.Live, embedUrl) {
+                this.plot = "پەخشی ڕاستەوخۆ - $serverName"
+            }
+        }
+
         val html = runCatching { app.get(pageUrl).text }.getOrNull().orEmpty()
         if (html.isBlank()) return null
         val doc = Jsoup.parse(html)
@@ -161,6 +192,17 @@ class KartonikurdeProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         if (data.isBlank()) return false
+
+        // Handle broadcast embed URLs directly
+        if (data.startsWith("http") && broadcastServers.any { it.first == data }) {
+            val full = if (data.startsWith("//")) "https:$data" else data
+            val ok = runCatching {
+                loadExtractor(full, referer = mainUrl, subtitleCallback, callback) == true
+                    || resolveSourcesPage(full, subtitleCallback, callback)
+            }.getOrDefault(false)
+            return ok
+        }
+
         val links = mutableListOf<String>()
         runCatching {
             val root = mapper.readTree(data)
@@ -169,7 +211,7 @@ class KartonikurdeProvider : MainAPI() {
                 else -> root.path("servers").forEach { serverLinks(it, links) }
             }
         }
-
+        if (links.isEmpty()) return false
         var found = false
         for (link in links) {
             val full = if (link.startsWith("//")) "https:$link" else link
@@ -179,104 +221,7 @@ class KartonikurdeProvider : MainAPI() {
             }.getOrDefault(false)
             if (ok) found = true
         }
-        if (resolveBroadcastServers(subtitleCallback, callback)) found = true
-
         return found
-    }
-
-    private suspend fun resolveBroadcastServers(
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        var found = false
-        if (resolveVidmoly("https://vidmoly.org/embed-zd7ymvfj17ul.html", callback)) found = true
-        if (resolveAbyssPlayer("https://player.abyssplayer.com/m6WUkwsY9", callback)) found = true
-        if (resolveMorencius("https://morencius.com/embed/k6b5ubdcpj5n", subtitleCallback, callback)) found = true
-        return found
-    }
-
-    /** Vidmoly: extracts stream from eval-obfuscated JS or plain sources array. */
-    private suspend fun resolveVidmoly(
-        url: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        val headers = mapOf(
-            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer" to "$mainUrl/"
-        )
-        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
-        val file = Regex("""file\s*:\s*["']([^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
-            ?: Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
-            ?: return false
-        callback.invoke(
-            newExtractorLink(
-                source = name,
-                name = "Vidmoly",
-                url = file,
-                type = ExtractorLinkType.M3U8
-            ) {
-                this.referer = url
-                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
-            }
-        )
-        return true
-    }
-
-    /** AbyssPlayer: extracts HLS/MP4 stream from the player embed page. */
-    private suspend fun resolveAbyssPlayer(
-        url: String,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        val headers = mapOf(
-            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer" to "$mainUrl/"
-        )
-        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
-        val file = Regex("""["'](https?://[^"']+\.(?:m3u8|mp4)[^"']*)["']""").find(page)?.groupValues?.get(1)
-            ?: Regex("""src\s*:\s*["']([^"']+)["']""").find(page)?.groupValues?.get(1)
-            ?: return false
-        val isM3u8 = file.contains(".m3u8", ignoreCase = true)
-        callback.invoke(
-            newExtractorLink(
-                source = name,
-                name = "AbyssPlayer",
-                url = file,
-                type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-            ) {
-                this.referer = url
-                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
-            }
-        )
-        return true
-    }
-
-    /** Morencius: extracts HLS/MP4 from sources array or inline JS. */
-    private suspend fun resolveMorencius(
-        url: String,
-        subtitleCallback: (SubtitleFile) -> Unit,
-        callback: (ExtractorLink) -> Unit
-    ): Boolean {
-        val headers = mapOf(
-            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Referer" to "$mainUrl/"
-        )
-        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
-        if (resolveSourcesPage(url, subtitleCallback, callback)) return true
-        val file = Regex("""["'](https?://[^"']+\.(?:m3u8|mp4)[^"']*)["']""").find(page)?.groupValues?.get(1)
-            ?: return false
-        val isM3u8 = file.contains(".m3u8", ignoreCase = true)
-        callback.invoke(
-            newExtractorLink(
-                source = name,
-                name = "Morencius",
-                url = file,
-                type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
-            ) {
-                this.referer = url
-                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
-            }
-        )
-        return true
     }
 
     private suspend fun resolveSourcesPage(
@@ -293,16 +238,16 @@ class KartonikurdeProvider : MainAPI() {
         val sourcesMatch = Regex("""sources\s*:\s*\[(.*?)\]""", setOf(RegexOption.DOT_MATCHES_ALL))
             .find(page) ?: return false
         val sources = sourcesMatch.groupValues[1]
-        val files = Regex("""file\s*:\s*["']([^"']+)["']""").findAll(sources)
+        val files = Regex("""file\s*:\s*"([^"]+)"""").findAll(sources)
             .map { it.groupValues[1] }.toList()
-        val labels = Regex("""label\s*:\s*["']([^"']+)["']""").findAll(sources)
+        val labels = Regex("""label\s*:\s*"([^"]+)"""").findAll(sources)
             .map { it.groupValues[1] }.toList()
         var found = false
         files.forEachIndexed { index, rawFile ->
             val file = if (rawFile.startsWith("//")) "https:$rawFile" else rawFile
             if (file.isBlank()) return@forEachIndexed
             val label = labels.getOrNull(index).orEmpty()
-            val isM3u8 = file.substringAfterLast('.').substringBefore('?').equals("m3u8", true)
+            val isM3u8 = file.endsWith(".m3u8")
             callback.invoke(
                 newExtractorLink(
                     name,
