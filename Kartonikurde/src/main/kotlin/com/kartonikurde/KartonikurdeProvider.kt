@@ -111,8 +111,6 @@ class KartonikurdeProvider : MainAPI() {
 
     override suspend fun load(url: String): LoadResponse? {
         val pageUrl = url.trim()
-
-        // Handle broadcast URLs
         if (pageUrl.startsWith("broadcast://")) {
             val embedUrl = pageUrl.removePrefix("broadcast://")
             val serverName = broadcastServers.firstOrNull { it.first == embedUrl }?.second
@@ -192,8 +190,6 @@ class KartonikurdeProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         if (data.isBlank()) return false
-
-        // Handle broadcast embed URLs directly
         if (data.startsWith("http") && broadcastServers.any { it.first == data }) {
             val full = if (data.startsWith("//")) "https:$data" else data
             val ok = runCatching {
