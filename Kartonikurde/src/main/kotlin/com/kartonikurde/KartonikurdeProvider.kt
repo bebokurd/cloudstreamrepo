@@ -179,8 +179,6 @@ class KartonikurdeProvider : MainAPI() {
             }.getOrDefault(false)
             if (ok) found = true
         }
-
-        // Broadcast servers – resolved with dedicated scrapers
         if (resolveBroadcastServers(subtitleCallback, callback)) found = true
 
         return found
@@ -207,7 +205,6 @@ class KartonikurdeProvider : MainAPI() {
             "Referer" to "$mainUrl/"
         )
         val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
-        // Try direct file pattern first
         val file = Regex("""file\s*:\s*["']([^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
             ?: Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
             ?: return false
@@ -264,9 +261,7 @@ class KartonikurdeProvider : MainAPI() {
             "Referer" to "$mainUrl/"
         )
         val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
-        // Try sources array pattern
         if (resolveSourcesPage(url, subtitleCallback, callback)) return true
-        // Fallback: bare URL
         val file = Regex("""["'](https?://[^"']+\.(?:m3u8|mp4)[^"']*)["']""").find(page)?.groupValues?.get(1)
             ?: return false
         val isM3u8 = file.contains(".m3u8", ignoreCase = true)
