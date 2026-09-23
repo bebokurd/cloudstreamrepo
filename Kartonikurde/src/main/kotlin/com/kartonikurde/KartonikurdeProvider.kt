@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -170,9 +173,51 @@ class KartonikurdeProvider : MainAPI() {
         var found = false
         for (link in links) {
             val full = if (link.startsWith("//")) "https:$link" else link
-            if (loadExtractor(full, referer = mainUrl, subtitleCallback, callback) == true) {
-                found = true
-            }
+            val ok = runCatching {
+                loadExtractor(full, referer = mainUrl, subtitleCallback, callback) == true
+                    || resolveSourcesPage(full, subtitleCallback, callback)
+            }.getOrDefault(false)
+            if (ok) found = true
+        }
+        return found
+    }
+
+    private suspend fun resolveSourcesPage(
+        url: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val headers = mapOf(
+            "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36",
+            "Referer" to "$mainUrl/",
+            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        )
+        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
+        val sourcesMatch = Regex("""sources\s*:\s*\[(.*?)\]""", setOf(RegexOption.DOT_MATCHES_ALL))
+            .find(page) ?: return false
+        val sources = sourcesMatch.groupValues[1]
+        val files = Regex("""file\s*:\s*"([^"]+)"""").findAll(sources)
+            .map { it.groupValues[1] }.toList()
+        val labels = Regex("""label\s*:\s*"([^"]+)"""").findAll(sources)
+            .map { it.groupValues[1] }.toList()
+        var found = false
+        files.forEachIndexed { index, rawFile ->
+            val file = if (rawFile.startsWith("//")) "https:$rawFile" else rawFile
+            if (file.isBlank()) return@forEachIndexed
+            val label = labels.getOrNull(index).orEmpty()
+            val isM3u8 = file.endsWith(".m3u8")
+            callback.invoke(
+                newExtractorLink(
+                    name,
+                    "${if (isM3u8) "HLS" else "MP4"}${if (label.isNotBlank()) " $label" else ""}",
+                    file,
+                    if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+                ) {
+                    this.referer = "$mainUrl/"
+                    if (label.isNotBlank()) this.quality = getQualityFromName(label)
+                }
+            )
+            found = true
         }
         return found
     }
