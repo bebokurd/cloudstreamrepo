@@ -169,9 +169,7 @@ class KartonikurdeProvider : MainAPI() {
                 else -> root.path("servers").forEach { serverLinks(it, links) }
             }
         }
-        links += broadcastServers
 
-        if (links.isEmpty()) return false
         var found = false
         for (link in links) {
             val full = if (link.startsWith("//")) "https:$link" else link
@@ -181,7 +179,109 @@ class KartonikurdeProvider : MainAPI() {
             }.getOrDefault(false)
             if (ok) found = true
         }
+
+        // Broadcast servers – resolved with dedicated scrapers
+        if (resolveBroadcastServers(subtitleCallback, callback)) found = true
+
         return found
+    }
+
+    private suspend fun resolveBroadcastServers(
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        var found = false
+        if (resolveVidmoly("https://vidmoly.org/embed-zd7ymvfj17ul.html", callback)) found = true
+        if (resolveAbyssPlayer("https://player.abyssplayer.com/m6WUkwsY9", callback)) found = true
+        if (resolveMorencius("https://morencius.com/embed/k6b5ubdcpj5n", subtitleCallback, callback)) found = true
+        return found
+    }
+
+    /** Vidmoly: extracts stream from eval-obfuscated JS or plain sources array. */
+    private suspend fun resolveVidmoly(
+        url: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val headers = mapOf(
+            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Referer" to "$mainUrl/"
+        )
+        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
+        // Try direct file pattern first
+        val file = Regex("""file\s*:\s*["']([^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
+            ?: Regex("""["'](https?://[^"']+\.m3u8[^"']*)["']""").find(page)?.groupValues?.get(1)
+            ?: return false
+        callback.invoke(
+            newExtractorLink(
+                source = name,
+                name = "Vidmoly",
+                url = file,
+                type = ExtractorLinkType.M3U8
+            ) {
+                this.referer = url
+                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
+            }
+        )
+        return true
+    }
+
+    /** AbyssPlayer: extracts HLS/MP4 stream from the player embed page. */
+    private suspend fun resolveAbyssPlayer(
+        url: String,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val headers = mapOf(
+            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Referer" to "$mainUrl/"
+        )
+        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
+        val file = Regex("""["'](https?://[^"']+\.(?:m3u8|mp4)[^"']*)["']""").find(page)?.groupValues?.get(1)
+            ?: Regex("""src\s*:\s*["']([^"']+)["']""").find(page)?.groupValues?.get(1)
+            ?: return false
+        val isM3u8 = file.contains(".m3u8", ignoreCase = true)
+        callback.invoke(
+            newExtractorLink(
+                source = name,
+                name = "AbyssPlayer",
+                url = file,
+                type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+            ) {
+                this.referer = url
+                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
+            }
+        )
+        return true
+    }
+
+    /** Morencius: extracts HLS/MP4 from sources array or inline JS. */
+    private suspend fun resolveMorencius(
+        url: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        val headers = mapOf(
+            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Referer" to "$mainUrl/"
+        )
+        val page = runCatching { app.get(url, headers = headers).text }.getOrNull() ?: return false
+        // Try sources array pattern
+        if (resolveSourcesPage(url, subtitleCallback, callback)) return true
+        // Fallback: bare URL
+        val file = Regex("""["'](https?://[^"']+\.(?:m3u8|mp4)[^"']*)["']""").find(page)?.groupValues?.get(1)
+            ?: return false
+        val isM3u8 = file.contains(".m3u8", ignoreCase = true)
+        callback.invoke(
+            newExtractorLink(
+                source = name,
+                name = "Morencius",
+                url = file,
+                type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
+            ) {
+                this.referer = url
+                this.quality = com.lagradost.cloudstream3.utils.Qualities.Unknown.value
+            }
+        )
+        return true
     }
 
     private suspend fun resolveSourcesPage(
@@ -255,12 +355,5 @@ class KartonikurdeProvider : MainAPI() {
 
     private companion object {
         val mapper = ObjectMapper()
-
-        /** Hardcoded broadcast server embeds appended to every loadLinks call. */
-        val broadcastServers = listOf(
-            "https://vidmoly.org/embed-zd7ymvfj17ul.html",
-            "https://player.abyssplayer.com/m6WUkwsY9",
-            "https://morencius.com/embed/k6b5ubdcpj5n"
-        )
     }
 }
