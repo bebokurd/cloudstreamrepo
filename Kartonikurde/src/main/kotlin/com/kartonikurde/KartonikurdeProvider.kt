@@ -169,8 +169,6 @@ class KartonikurdeProvider : MainAPI() {
                 else -> root.path("servers").forEach { serverLinks(it, links) }
             }
         }
-
-        // Broadcast servers – always appended
         links += broadcastServers
 
         if (links.isEmpty()) return false
