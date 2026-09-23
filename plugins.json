@@ -493,14 +493,14 @@
     {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Kartonikurde.cs3",
         "status": 1,
-        "version": 1,
+        "version": 2,
         "name": "Kartonikurde",
         "internalName": "Kartonikurde",
         "authors": [
             "Abodabodd"
         ],
         "description": "کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی",
-        "fileSize": 18111,
+        "fileSize": 38837,
         "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
         "language": "ar",
         "tvTypes": [
@@ -510,7 +510,7 @@
         ],
         "iconUrl": "https://www.kartonikurde.com/icon/favicon-32x32.png",
         "apiVersion": 1,
-        "fileHash": "sha256-1c6fe4e55980879d3cb3d6002e0bbf16cc9b4af62f47229d3bfe2d1675341f28"
+        "fileHash": "sha256-f5d4f051468b34f0465f0331a8723e14a988a4345e30cfbabf6ee7bbd464b0ca"
     },
     {
         "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Krmzy.cs3",
@@ -978,27 +978,6 @@
             "Movie"
         ],
         "iconUrl": "https://cartoontime.net/wp-content/uploads/2026/05/cropped-icon1-192x192.jpg",
-        "apiVersion": 1
-    },
-    {
-        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Kartonikurde.cs3",
-        "status": 1,
-        "version": 1,
-        "name": "Kartonikurde",
-        "internalName": "Kartonikurde",
-        "authors": [
-            "Abodabodd"
-        ],
-        "description": "کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی",
-        "fileSize": 0,
-        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
-        "language": "ar",
-        "tvTypes": [
-            "TvSeries",
-            "Cartoon",
-            "Movie"
-        ],
-        "iconUrl": "https://www.kartonikurde.com/icon/favicon-32x32.png",
         "apiVersion": 1
     }
 ]

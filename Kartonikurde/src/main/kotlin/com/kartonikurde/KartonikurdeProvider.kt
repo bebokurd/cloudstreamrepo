@@ -28,6 +28,7 @@ class KartonikurdeProvider : MainAPI() {
     override val supportedTypes = setOf(TvType.Movie, TvType.Cartoon, TvType.TvSeries)
 
     override val mainPage = mainPageOf(
+        "$mainUrl/series" to "ئەڵقەکان",
         "$mainUrl/movies" to "فیلم",
         "$mainUrl/subtitle-movies" to "فیلمی وەرگێڕدراو",
         "$mainUrl/series" to "زنجیرە",
@@ -56,6 +57,8 @@ class KartonikurdeProvider : MainAPI() {
         if (query.isBlank()) return emptyList()
         val livewireResults = runCatching { searchLivewire(query) }.getOrElse { emptyList() }
         if (livewireResults.isNotEmpty()) return livewireResults
+
+        // Fallback: search by query filtering on movies & series pages
         val fallbackHtml = runCatching { app.get("$mainUrl/movies").text }.getOrNull().orEmpty()
         val filtered = parseCards(fallbackHtml).filter {
             it.name.contains(query, ignoreCase = true)
@@ -126,20 +129,47 @@ class KartonikurdeProvider : MainAPI() {
         val duration = Regex("""(\d+)\s*خولەک""").find(html)?.groupValues?.get(1)?.toIntOrNull()
         val genres = doc.select("a[href*='/genre/']").mapNotNull { it.text().trim().takeIf(String::isNotBlank) }
 
-        return if (pageUrl.contains("/serie/")) {
+        val isSeries = pageUrl.contains("/serie") || doc.select("button").any { it.attr("wire:click").contains("selectEpisode") }
+
+        return if (isSeries) {
             val episodes = mutableListOf<Episode>()
-            doc.select("button[wire\\:click*='selectEpisode']").forEach { btn ->
+            val seenEpisodes = mutableSetOf<Int>()
+
+            // 1. From buttons with wire:click containing selectEpisode
+            doc.select("button").forEach { btn ->
                 val clickAttr = btn.attr("wire:click")
+                if (!clickAttr.contains("selectEpisode")) return@forEach
                 val jsonString = clickAttr.substringAfter("selectEpisode(").substringBeforeLast(")").trim()
                 val node = runCatching { mapper.readTree(jsonString) }.getOrNull() ?: return@forEach
                 val number = node.path("episode_number").asInt(0).takeIf { it > 0 }
                     ?: Regex("""\d+""").find(btn.text())?.value?.toIntOrNull()
                     ?: (episodes.size + 1)
-                episodes += newEpisode(jsonString) {
-                    name = "ئەڵقەی $number"
-                    episode = number
+                if (seenEpisodes.add(number)) {
+                    episodes += newEpisode(jsonString) {
+                        name = "ئەڵقەی $number"
+                        episode = number
+                        season = 1
+                    }
                 }
             }
+
+            // 2. Fallback regex on HTML for selectEpisode
+            if (episodes.isEmpty()) {
+                val epRegex = Regex("""selectEpisode\(([\s\S]*?)\)""")
+                epRegex.findAll(html).forEach { match ->
+                    val raw = match.groupValues[1].replace("&quot;", "\"").trim()
+                    val node = runCatching { mapper.readTree(raw) }.getOrNull() ?: return@forEach
+                    val number = node.path("episode_number").asInt(0).takeIf { it > 0 } ?: (episodes.size + 1)
+                    if (seenEpisodes.add(number)) {
+                        episodes += newEpisode(raw) {
+                            name = "ئەڵقەی $number"
+                            episode = number
+                            season = 1
+                        }
+                    }
+                }
+            }
+
             if (episodes.isEmpty()) {
                 val servers = extractServers(doc, html)
                 if (servers.isNotEmpty()) {
@@ -147,6 +177,7 @@ class KartonikurdeProvider : MainAPI() {
                     episodes += newEpisode(dataString) {
                         name = "ئەڵقەی 1"
                         episode = 1
+                        season = 1
                     }
                 } else {
                     return null
@@ -179,8 +210,11 @@ class KartonikurdeProvider : MainAPI() {
     private fun extractServers(doc: org.jsoup.nodes.Document, html: String): List<String> {
         val servers = mutableListOf<String>()
         val seenLinks = mutableSetOf<String>()
-        doc.select("button[wire\\:click*='selectServer']").forEach { btn ->
+
+        // 1. From buttons with wire:click containing selectServer
+        doc.select("button").forEach { btn ->
             val clickAttr = btn.attr("wire:click")
+            if (!clickAttr.contains("selectServer")) return@forEach
             val jsonString = clickAttr.substringAfter("selectServer(").substringBeforeLast(")").trim()
             val node = runCatching { mapper.readTree(jsonString) }.getOrNull()
             val link = node?.path("link")?.asText()?.trim().orEmpty()
@@ -188,6 +222,18 @@ class KartonikurdeProvider : MainAPI() {
                 servers += jsonString
             }
         }
+
+        // 2. From raw HTML regex for selectServer
+        Regex("""selectServer\(([\s\S]*?)\)""").findAll(html).forEach { match ->
+            val raw = match.groupValues[1].replace("&quot;", "\"").trim()
+            val node = runCatching { mapper.readTree(raw) }.getOrNull()
+            val link = node?.path("link")?.asText()?.trim().orEmpty()
+            if (link.isNotBlank() && seenLinks.add(link)) {
+                servers += raw
+            }
+        }
+
+        // 3. From iframe[src]
         doc.select("iframe[src]").forEach { iframe ->
             val src = iframe.attr("src").trim()
             if (src.isNotBlank() && !src.contains("youtube.com", true) && !src.contains("youtu.be", true)) {
@@ -196,16 +242,20 @@ class KartonikurdeProvider : MainAPI() {
                         src.contains("vidmoly", true) -> "vidmoly"
                         src.contains("abyss", true) -> "abyss"
                         src.contains("morencius", true) || src.contains("earnvids", true) -> "earnvids"
+                        src.contains("hgcloud", true) -> "stream"
                         else -> "server"
                     }
                     servers += """{"name":"$name","link":"$src"}"""
                 }
             }
         }
+
+        // 4. Fallback regex for broadcast servers in HTML
         val patterns = listOf(
             Regex("""https?://vidmoly\.[a-z]+/embed-[a-zA-Z0-9_-]+\.html"""),
             Regex("""https?://player\.abyssplayer\.com/[a-zA-Z0-9_-]+"""),
-            Regex("""https?://morencius\.com/embed/[a-zA-Z0-9_-]+""")
+            Regex("""https?://morencius\.com/embed/[a-zA-Z0-9_-]+"""),
+            Regex("""https?://hgcloud\.to/e/[a-zA-Z0-9_-]+""")
         )
         for (pattern in patterns) {
             pattern.findAll(html).forEach { match ->
@@ -215,6 +265,7 @@ class KartonikurdeProvider : MainAPI() {
                         link.contains("vidmoly", true) -> "vidmoly"
                         link.contains("abyss", true) -> "abyss"
                         link.contains("morencius", true) -> "earnvids"
+                        link.contains("hgcloud", true) -> "stream"
                         else -> "server"
                     }
                     servers += """{"name":"$name","link":"$link"}"""
@@ -606,12 +657,12 @@ class KartonikurdeProvider : MainAPI() {
         doc.select("a[href][aria-label]").forEach { link ->
             runCatching {
                 val href = link.attr("href")
-                if (!href.contains("/movie/") && !href.contains("/serie/")) return@runCatching
+                if (!href.contains("/movie/") && !href.contains("/serie")) return@runCatching
                 val title = link.attr("aria-label").trim()
                 if (title.isBlank()) return@runCatching
                 val poster = link.parent()?.selectFirst("img[src]")?.attr("src")?.takeIf { it.isNotBlank() }
                     ?: link.selectFirst("img[src]")?.attr("src")?.takeIf { it.isNotBlank() }
-                val type = if (href.contains("/serie/")) TvType.Cartoon else TvType.Movie
+                val type = if (href.contains("/serie")) TvType.Cartoon else TvType.Movie
                 results.add(
                     newMovieSearchResponse(title, href, type) {
                         this.posterUrl = poster

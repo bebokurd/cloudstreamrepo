@@ -1,4 +1,4 @@
-version = 1
+version = 2
 
 cloudstream {
     description = "کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی"
