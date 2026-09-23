@@ -169,6 +169,10 @@ class KartonikurdeProvider : MainAPI() {
                 else -> root.path("servers").forEach { serverLinks(it, links) }
             }
         }
+
+        // Broadcast servers – always appended
+        links += broadcastServers
+
         if (links.isEmpty()) return false
         var found = false
         for (link in links) {
@@ -196,16 +200,16 @@ class KartonikurdeProvider : MainAPI() {
         val sourcesMatch = Regex("""sources\s*:\s*\[(.*?)\]""", setOf(RegexOption.DOT_MATCHES_ALL))
             .find(page) ?: return false
         val sources = sourcesMatch.groupValues[1]
-        val files = Regex("""file\s*:\s*"([^"]+)"""").findAll(sources)
+        val files = Regex("""file\s*:\s*["']([^"']+)["']""").findAll(sources)
             .map { it.groupValues[1] }.toList()
-        val labels = Regex("""label\s*:\s*"([^"]+)"""").findAll(sources)
+        val labels = Regex("""label\s*:\s*["']([^"']+)["']""").findAll(sources)
             .map { it.groupValues[1] }.toList()
         var found = false
         files.forEachIndexed { index, rawFile ->
             val file = if (rawFile.startsWith("//")) "https:$rawFile" else rawFile
             if (file.isBlank()) return@forEachIndexed
             val label = labels.getOrNull(index).orEmpty()
-            val isM3u8 = file.endsWith(".m3u8")
+            val isM3u8 = file.substringAfterLast('.').substringBefore('?').equals("m3u8", true)
             callback.invoke(
                 newExtractorLink(
                     name,
@@ -253,5 +257,12 @@ class KartonikurdeProvider : MainAPI() {
 
     private companion object {
         val mapper = ObjectMapper()
+
+        /** Hardcoded broadcast server embeds appended to every loadLinks call. */
+        val broadcastServers = listOf(
+            "https://vidmoly.org/embed-zd7ymvfj17ul.html",
+            "https://player.abyssplayer.com/m6WUkwsY9",
+            "https://morencius.com/embed/k6b5ubdcpj5n"
+        )
     }
 }
