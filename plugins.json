@@ -979,5 +979,26 @@
         ],
         "iconUrl": "https://cartoontime.net/wp-content/uploads/2026/05/cropped-icon1-192x192.jpg",
         "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/Kartonikurde.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "Kartonikurde",
+        "internalName": "Kartonikurde",
+        "authors": [
+            "Abodabodd"
+        ],
+        "description": "کارتۆن و فیلم و زنجیرەی دۆبلاژکراو بە کوردی",
+        "fileSize": 0,
+        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
+        "language": "ar",
+        "tvTypes": [
+            "TvSeries",
+            "Cartoon",
+            "Movie"
+        ],
+        "iconUrl": "https://www.kartonikurde.com/icon/favicon-32x32.png",
+        "apiVersion": 1
     }
 ]
