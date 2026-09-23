@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "مشاهدة فيديوهات Ok.ru - أفلام وفيديوهات"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

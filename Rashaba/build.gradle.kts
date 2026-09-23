@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "رەشەبا - پلاتفۆرمی ڤیدیۆی کوردی"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "کوردۆرا - پلاتفۆرمی ڤیدیۆی کوردی (فیلم و زنجیرە)"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

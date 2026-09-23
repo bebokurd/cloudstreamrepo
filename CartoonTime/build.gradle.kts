@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "مشاهدة وتحميل افلام الكرتون وكرتون ديزني مدبلج مجانا"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

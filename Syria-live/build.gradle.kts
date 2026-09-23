@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "قنوات ومسلسلات وأفلام سورية بث مباشر"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

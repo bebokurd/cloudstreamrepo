@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "المسلسلات التركية والآسيوية مترجمة بجودة عالية"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

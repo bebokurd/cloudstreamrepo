@@ -2,7 +2,7 @@ version = 1
 
 cloudstream {
     description = "أفلام ومسلسلات عربية وأجنبية مترجمة بجودة عالية"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

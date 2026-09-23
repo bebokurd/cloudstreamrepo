@@ -2,7 +2,7 @@ version = 3
 
 cloudstream {
     description = "مشاهدة وتحميل الأفلام والمسلسلات العربية مجانا"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1

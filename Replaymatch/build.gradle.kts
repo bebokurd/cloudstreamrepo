@@ -2,7 +2,7 @@ version = 2
 
 cloudstream {
     description = "Watch football and sports matches with full replays"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "en"
 
     status = 1

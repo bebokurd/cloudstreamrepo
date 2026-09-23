@@ -2,7 +2,7 @@ version = 4
 
 cloudstream {
     description = "لا يعمل خارج العراق او اي شبكة غير ايرثلنك"
-    authors = listOf("Abodabodd")
+    authors = listOf("bebokurd")
     language = "ar"
 
     status = 1
