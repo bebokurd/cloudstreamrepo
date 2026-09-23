@@ -57,8 +57,6 @@ class KartonikurdeProvider : MainAPI() {
         if (query.isBlank()) return emptyList()
         val livewireResults = runCatching { searchLivewire(query) }.getOrElse { emptyList() }
         if (livewireResults.isNotEmpty()) return livewireResults
-
-        // Fallback: search by query filtering on movies & series pages
         val fallbackHtml = runCatching { app.get("$mainUrl/movies").text }.getOrNull().orEmpty()
         val filtered = parseCards(fallbackHtml).filter {
             it.name.contains(query, ignoreCase = true)
@@ -134,8 +132,6 @@ class KartonikurdeProvider : MainAPI() {
         return if (isSeries) {
             val episodes = mutableListOf<Episode>()
             val seenEpisodes = mutableSetOf<Int>()
-
-            // 1. From buttons with wire:click containing selectEpisode
             doc.select("button").forEach { btn ->
                 val clickAttr = btn.attr("wire:click")
                 if (!clickAttr.contains("selectEpisode")) return@forEach
@@ -152,8 +148,6 @@ class KartonikurdeProvider : MainAPI() {
                     }
                 }
             }
-
-            // 2. Fallback regex on HTML for selectEpisode
             if (episodes.isEmpty()) {
                 val epRegex = Regex("""selectEpisode\(([\s\S]*?)\)""")
                 epRegex.findAll(html).forEach { match ->
@@ -210,8 +204,6 @@ class KartonikurdeProvider : MainAPI() {
     private fun extractServers(doc: org.jsoup.nodes.Document, html: String): List<String> {
         val servers = mutableListOf<String>()
         val seenLinks = mutableSetOf<String>()
-
-        // 1. From buttons with wire:click containing selectServer
         doc.select("button").forEach { btn ->
             val clickAttr = btn.attr("wire:click")
             if (!clickAttr.contains("selectServer")) return@forEach
@@ -222,8 +214,6 @@ class KartonikurdeProvider : MainAPI() {
                 servers += jsonString
             }
         }
-
-        // 2. From raw HTML regex for selectServer
         Regex("""selectServer\(([\s\S]*?)\)""").findAll(html).forEach { match ->
             val raw = match.groupValues[1].replace("&quot;", "\"").trim()
             val node = runCatching { mapper.readTree(raw) }.getOrNull()
@@ -232,8 +222,6 @@ class KartonikurdeProvider : MainAPI() {
                 servers += raw
             }
         }
-
-        // 3. From iframe[src]
         doc.select("iframe[src]").forEach { iframe ->
             val src = iframe.attr("src").trim()
             if (src.isNotBlank() && !src.contains("youtube.com", true) && !src.contains("youtu.be", true)) {
@@ -249,8 +237,6 @@ class KartonikurdeProvider : MainAPI() {
                 }
             }
         }
-
-        // 4. Fallback regex for broadcast servers in HTML
         val patterns = listOf(
             Regex("""https?://vidmoly\.[a-z]+/embed-[a-zA-Z0-9_-]+\.html"""),
             Regex("""https?://player\.abyssplayer\.com/[a-zA-Z0-9_-]+"""),
