@@ -393,9 +393,9 @@ class AnimeZidProvider : MainAPI() {
                             source = "AnimeZid",
                             name = provider,
                             url = videoUrl,
+                            type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                         ) {
                             this.referer = if (finalUrl.contains("ruby") || finalUrl.contains("stream")) "https://$host/" else finalUrl
-                            type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                             quality = videoQuality
                         }
                     )
@@ -621,10 +621,10 @@ class AnimeZidProvider : MainAPI() {
                 newExtractorLink(
                     source = "AnimeZid",
                     name = "TurboViPlay",
-                    url = m3u8
+                    url = m3u8,
+                    type = ExtractorLinkType.M3U8
                 ) {
                     this.referer = embedUrl
-                    this.type = ExtractorLinkType.M3U8
                     this.quality = Qualities.P1080.value
                 }
             )
@@ -695,10 +695,10 @@ class AnimeZidProvider : MainAPI() {
                                         newExtractorLink(
                                             source = "AnimeZid",
                                             name = "MegaMax ${extLink.name} ($label)",
-                                            url = extLink.url
+                                            url = extLink.url,
+                                            type = extLink.type
                                         ) {
                                             this.referer = extLink.referer
-                                            this.type = extLink.type
                                             this.quality = if (extLink.quality != Qualities.Unknown.value) extLink.quality else q
                                             this.headers = extLink.headers
                                         }
