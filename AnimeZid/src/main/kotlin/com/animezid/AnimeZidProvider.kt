@@ -610,7 +610,7 @@ class AnimeZidProvider : MainAPI() {
         }
     }
 
-    private fun extractTurboViPlay(embedUrl: String, page: String, callback: (ExtractorLink) -> Unit): Int {
+    private suspend fun extractTurboViPlay(embedUrl: String, page: String, callback: (ExtractorLink) -> Unit): Int {
         var count = 0
         val m3u8 = Regex("""data-hash=["'](https?://[^"']+\.m3u8[^"']*)["']""", RegexOption.IGNORE_CASE)
             .find(page)?.groupValues?.get(1)
@@ -691,18 +691,20 @@ class AnimeZidProvider : MainAPI() {
                         } else {
                             try {
                                 loadExtractor(fullLink, embedUrl, subtitleCallback) { extLink ->
-                                    callback(
-                                        newExtractorLink(
-                                            source = "AnimeZid",
-                                            name = "MegaMax ${extLink.name} ($label)",
-                                            url = extLink.url,
-                                            type = extLink.type
-                                        ) {
-                                            this.referer = extLink.referer
-                                            this.quality = if (extLink.quality != Qualities.Unknown.value) extLink.quality else q
-                                            this.headers = extLink.headers
-                                        }
-                                    )
+                                    kotlinx.coroutines.runBlocking {
+                                        callback(
+                                            newExtractorLink(
+                                                source = "AnimeZid",
+                                                name = "MegaMax ${extLink.name} ($label)",
+                                                url = extLink.url,
+                                                type = extLink.type
+                                            ) {
+                                                this.referer = extLink.referer
+                                                this.quality = if (extLink.quality != Qualities.Unknown.value) extLink.quality else q
+                                                this.headers = extLink.headers
+                                            }
+                                        )
+                                    }
                                     count++
                                 }
                             } catch (e: Exception) {
