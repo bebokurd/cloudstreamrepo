@@ -12,6 +12,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.coroutines.delay
 import java.net.URLEncoder
 import java.util.Locale
 
@@ -324,11 +325,11 @@ class AnimeZidProvider : MainAPI() {
             val sessionId = session.sessionId ?: return false
 
             val sourceOrder = listOf(
-                "Uqload", "StreamRuby", "VidTube", "DoodStream", "TurboViPlay",
-                "MegaMax", "PlayMate", "StreamP2P", "RPMShare", "UPNShare"
+                "MegaMax", "StreamRuby", "TurboViPlay", "Uqload", "DoodStream",
+                "VidTube", "PlayMate", "StreamWish", "Abyss", "RPMShare", "UPNShare"
             )
             val sources = (session.sources ?: emptyList())
-                .filter { it.type == "embedded_web" && !it.id.isNullOrBlank() }
+                .filter { !it.id.isNullOrBlank() }
                 .sortedBy { src ->
                     val idx = sourceOrder.indexOf(src.provider)
                     if (idx < 0) Int.MAX_VALUE / 2 else idx
@@ -339,6 +340,9 @@ class AnimeZidProvider : MainAPI() {
             for (source in sources) {
                 val sourceId = source.id ?: continue
                 val provider = source.provider ?: continue
+
+                delay(250)
+
                 val resolved = try {
                     parseJson<PlaybackResolve>(
                         app.post(
@@ -353,37 +357,45 @@ class AnimeZidProvider : MainAPI() {
                 val launchUrl = resolved.launchUrl ?: resolved.resolveUrl ?: continue
 
                 val launchRes = try {
-                    app.get(launchUrl, headers = baseHeaders(playUrl), allowRedirects = false)
+                    app.get(launchUrl, headers = baseHeaders(playUrl), allowRedirects = true)
                 } catch (e: Exception) {
                     continue
                 }
                 var finalUrl = launchRes.url
                 var page = launchRes.text
-                val location = launchRes.headers["Location"] ?: launchRes.headers["location"]
-                if (location != null) {
-                    val target = if (location.startsWith("http")) location else "$mainUrl$location"
-                    val redirected = try {
-                        app.get(target, headers = baseHeaders(target))
-                    } catch (e: Exception) {
-                        continue
-                    }
-                    finalUrl = redirected.url
-                    page = redirected.text
+
+                // 1. MegaMax aggregator (Inertia partial reload for all mirrors & qualities)
+                if (provider.equals("MegaMax", true) || finalUrl.contains("megamax.me", true)) {
+                    val mmCount = extractMegaMax(finalUrl, page, subtitleCallback, callback)
+                    emitted += mmCount
+                    if (mmCount > 0) continue
                 }
 
+                // 2. TurboViPlay / turbovidhls broadcast server (HLS master m3u8)
+                if (provider.contains("Turbo", true) || finalUrl.contains("turbovid", true) || finalUrl.contains("turboviplay", true)) {
+                    val turboCount = extractTurboViPlay(finalUrl, page, callback)
+                    emitted += turboCount
+                    if (turboCount > 0) continue
+                }
+
+                // 3. Direct M3U8 or direct video in page
                 var result = EmbedResult()
                 if (page.removePrefix("\uFEFF").startsWith("#EXTM3U")) {
                     result = result.merge(EmbedResult(listOf(finalUrl to Qualities.Unknown.value)))
                 }
                 result = result.merge(extractDirectFromPage(page))
-                if (result.videos.isEmpty()) {
-                    if (isDoodHost(finalUrl)) {
-                        result = result.merge(extractDood(finalUrl, page))
-                    } else if (isEmbedPostHost(finalUrl)) {
-                        result = result.merge(postEmbedDl(finalUrl))
-                    }
+
+                // 4. DoodStream / PlayMogo
+                if (result.videos.isEmpty() && isDoodHost(finalUrl)) {
+                    result = result.merge(extractDood(finalUrl, page))
                 }
 
+                // 5. Embed POST dl (StreamRuby / RubyVidHub / VidTube)
+                if (result.videos.isEmpty() && isEmbedPostHost(finalUrl)) {
+                    result = result.merge(postEmbedDl(finalUrl))
+                }
+
+                val host = getHost(finalUrl)
                 for ((videoUrl, videoQuality) in result.videos) {
                     val isM3u8 = videoUrl.contains(".m3u8", ignoreCase = true)
                     callback(
@@ -392,15 +404,15 @@ class AnimeZidProvider : MainAPI() {
                             name = provider,
                             url = videoUrl,
                         ) {
-                            this.referer = finalUrl
+                            this.referer = if (finalUrl.contains("ruby") || finalUrl.contains("stream")) "https://$host/" else finalUrl
                             type = if (isM3u8) ExtractorLinkType.M3U8 else ExtractorLinkType.VIDEO
                             quality = videoQuality
                         }
                     )
                     emitted++
                 }
+
                 if (result.videos.isEmpty()) {
-                    val before = emitted
                     try {
                         loadExtractor(finalUrl, playUrl, subtitleCallback) { link ->
                             callback(link)
@@ -408,12 +420,11 @@ class AnimeZidProvider : MainAPI() {
                         }
                     } catch (e: Exception) {
                     }
-                    if ((provider.contains("vidlo", ignoreCase = true) ||
-                            finalUrl.contains("vidlo", ignoreCase = true))
-                    ) {
+                    if (provider.contains("vidlo", ignoreCase = true) || finalUrl.contains("vidlo", ignoreCase = true)) {
                         emitted += extractVidlo(finalUrl, tokenVidlo, callback)
                     }
                 }
+
                 val subSeen = HashSet<String>()
                 for ((lang, subUrl) in result.subtitles) {
                     if (subSeen.add(subUrl)) subtitleCallback(newSubtitleFile(lang, subUrl))
@@ -567,7 +578,8 @@ class AnimeZidProvider : MainAPI() {
     private fun isEmbedPostHost(url: String): Boolean {
         val host = getHost(url).lowercase()
         if (host.contains("vidtube") || host.contains("rubyvidhub") ||
-            host.contains("streamruby") || host.contains("playmogo")
+            host.contains("streamruby") || host.contains("playmogo") ||
+            host.contains("playmate")
         ) return true
         return try {
             val path = java.net.URI(url).path.orEmpty()
@@ -578,13 +590,17 @@ class AnimeZidProvider : MainAPI() {
     }
 
     private fun isDoodHost(url: String): Boolean {
-        return getHost(url).lowercase().contains("dood")
+        val host = getHost(url).lowercase()
+        return host.contains("dood") || host.contains("ds2play") ||
+            host.contains("playmogo") || host.contains("do0od") ||
+            host.contains("doodstream")
     }
 
     private suspend fun extractDood(finalUrl: String, page: String): EmbedResult {
         return try {
+            val content = if (page.isNotBlank()) page else app.get(finalUrl, headers = baseHeaders(finalUrl)).text
             val host = getHost(finalUrl)
-            val match = Regex("""/pass_md5/([a-zA-Z0-9]+)/(\d+)""").find(page) ?: return EmbedResult()
+            val match = Regex("""/pass_md5/([a-zA-Z0-9]+)/(\d+)""").find(content) ?: return EmbedResult()
             val md5 = match.groupValues[1]
             val ts = match.groupValues[2]
             val json = app.get(
@@ -602,6 +618,111 @@ class AnimeZidProvider : MainAPI() {
         } catch (e: Exception) {
             EmbedResult()
         }
+    }
+
+    private fun extractTurboViPlay(embedUrl: String, page: String, callback: (ExtractorLink) -> Unit): Int {
+        var count = 0
+        val m3u8 = Regex("""data-hash=["'](https?://[^"']+\.m3u8[^"']*)["']""", RegexOption.IGNORE_CASE)
+            .find(page)?.groupValues?.get(1)
+            ?: Regex("""['"](https?://[^"'\s<>]+\.m3u8[^"'\s<>]*)['"]""", RegexOption.IGNORE_CASE)
+                .find(page)?.groupValues?.get(1)
+        if (m3u8 != null) {
+            callback(
+                newExtractorLink(
+                    source = "AnimeZid",
+                    name = "TurboViPlay",
+                    url = m3u8
+                ) {
+                    this.referer = embedUrl
+                    this.type = ExtractorLinkType.M3U8
+                    this.quality = Qualities.P1080.value
+                }
+            )
+            count++
+        }
+        return count
+    }
+
+    private suspend fun extractMegaMax(
+        embedUrl: String,
+        initialPage: String,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit
+    ): Int {
+        var count = 0
+        try {
+            val version = Regex(""""version"\s*:\s*"([^"]+)"""").find(initialPage)?.groupValues?.get(1)
+            val headers = mutableMapOf(
+                "User-Agent" to userAgent,
+                "Referer" to embedUrl,
+                "X-Inertia" to "true",
+                "X-Inertia-Partial-Component" to "files/mirror/video",
+                "X-Inertia-Partial-Data" to "streams",
+                "Accept" to "text/html, application/xhtml+xml"
+            )
+            if (!version.isNullOrBlank()) {
+                headers["X-Inertia-Version"] = version
+            }
+            val resText = app.get(embedUrl, headers = headers).text
+
+            val qualityBlocks = Regex(
+                """\{[^{}]*"label"\s*:\s*"([^"]+)"[^{}]*"mirrors"\s*:\s*\[(.*?)\][^{}]*\}""",
+                setOf(RegexOption.DOT_MATCHES_ALL, RegexOption.IGNORE_CASE)
+            ).findAll(resText).toList()
+
+            for (b in qualityBlocks) {
+                val label = b.groupValues[1]
+                val q = qualityFromLabel(label)
+                val mirrorsStr = b.groupValues[2]
+                Regex("""\{[^{}]*"driver"\s*:\s*"([^"]+)"[^{}]*"link"\s*:\s*"([^"]+)"[^{}]*\}""", RegexOption.IGNORE_CASE)
+                    .findAll(mirrorsStr).forEach { m ->
+                        val driver = m.groupValues[1]
+                        val rawLink = m.groupValues[2].replace("\\/", "/")
+                        val fullLink = when {
+                            rawLink.startsWith("//") -> "https:$rawLink"
+                            rawLink.startsWith("http") -> rawLink
+                            else -> "https://$rawLink"
+                        }
+                        if (isDoodHost(fullLink)) {
+                            val doodRes = extractDood(fullLink, "")
+                            for ((vUrl, _) in doodRes.videos) {
+                                callback(
+                                    newExtractorLink(
+                                        source = "AnimeZid",
+                                        name = "MegaMax Dood ($label)",
+                                        url = vUrl
+                                    ) {
+                                        this.referer = fullLink
+                                        this.quality = q
+                                    }
+                                )
+                                count++
+                            }
+                        } else {
+                            try {
+                                loadExtractor(fullLink, embedUrl, subtitleCallback) { extLink ->
+                                    callback(
+                                        newExtractorLink(
+                                            source = "AnimeZid",
+                                            name = "MegaMax ${extLink.name} ($label)",
+                                            url = extLink.url
+                                        ) {
+                                            this.referer = extLink.referer
+                                            this.type = extLink.type
+                                            this.quality = if (extLink.quality != Qualities.Unknown.value) extLink.quality else q
+                                            this.headers = extLink.headers
+                                        }
+                                    )
+                                    count++
+                                }
+                            } catch (e: Exception) {
+                            }
+                        }
+                    }
+            }
+        } catch (e: Exception) {
+        }
+        return count
     }
 
     private suspend fun postEmbedDl(finalUrl: String): EmbedResult {
@@ -627,8 +748,22 @@ class AnimeZidProvider : MainAPI() {
                 )
             )
             val decoded = unpackPacker(res.text)
-            if (decoded != null) parsePackedMedia(decoded)
-            else extractDirectFromPage(res.text)
+            if (decoded != null) {
+                val packedRes = parsePackedMedia(decoded)
+                if (packedRes.videos.isNotEmpty()) {
+                    packedRes
+                } else {
+                    val m3u8s = Regex("""(https?://[^\s"'<>]+\.m3u8[^\s"'<>]*)""").findAll(decoded)
+                        .map { it.groupValues[1] to Qualities.P1080.value }.toList()
+                    if (m3u8s.isNotEmpty()) {
+                        EmbedResult(videos = m3u8s, subtitles = extractSubtitles(decoded))
+                    } else {
+                        packedRes
+                    }
+                }
+            } else {
+                extractDirectFromPage(res.text)
+            }
         } catch (e: Exception) {
             EmbedResult()
         }
