@@ -979,5 +979,28 @@
         ],
         "iconUrl": "https://cartoontime.net/wp-content/uploads/2026/05/cropped-icon1-192x192.jpg",
         "apiVersion": 1
+    },
+    {
+        "url": "https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/builds/AnimeZid.cs3",
+        "status": 1,
+        "version": 1,
+        "name": "AnimeZid",
+        "internalName": "AnimeZid",
+        "authors": [
+            "bebokurd"
+        ],
+        "description": "مشاهدة وتحميل الأنمي والكرتون والأفلام والمسلسلات مترجمة ومدبلجة للعربية",
+        "fileSize": 0,
+        "repositoryUrl": "https://github.com/bebokurd/cloudstreamrepo",
+        "language": "ar",
+        "tvTypes": [
+            "Anime",
+            "AnimeMovie",
+            "Cartoon",
+            "TvSeries",
+            "Movie"
+        ],
+        "iconUrl": "https://animezid.cam/templates/egybest-by-mrbrooks/img/favicon.ico",
+        "apiVersion": 1
     }
 ]

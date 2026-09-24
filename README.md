@@ -16,7 +16,7 @@
 https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.json
 ```
 
-![Plugins](https://img.shields.io/badge/Plugins-46-00c3ff?style=flat-square)
+![Plugins](https://img.shields.io/badge/Plugins-47-00c3ff?style=flat-square)
 ![Formats](https://img.shields.io/badge/Formats-DASH%20%26%20HLS-7a5cff?style=flat-square)
 ![Cloudstream](https://img.shields.io/badge/Cloudstream-3%2B-00c3ff?style=flat-square)
 ![Languages](https://img.shields.io/badge/Languages-Arabic%20%C2%B7%20Kurdish-00ff9d?style=flat-square)
@@ -33,7 +33,7 @@ https://raw.githubusercontent.com/bebokurd/cloudstreamrepo/refs/heads/main/repo.
 
 | | | |
 |:-:|:-:|:-:|
-| 🎬 **46 plugins**<br>Arabic & Kurdish sources | 📡 **Native streaming**<br>DASH / HLS playback | 🟣 **Kurdish content**<br>Rashaba · Kurdora · Kurdbin · Kartonikurde |
+| 🎬 **47 plugins**<br>Arabic & Kurdish sources | 📡 **Native streaming**<br>DASH / HLS playback | 🟣 **Kurdish content**<br>Rashaba · Kurdora · Kurdbin · Kartonikurde |
 | ⚡ **Lightweight**<br>Tiny `.cs3` plugins | 🔍 **Deep search**<br>Across every source | 🖥️ **Android TV**<br>Short codes included |
 
 ---
@@ -61,7 +61,7 @@ Typing a URL with a remote is painful — type one of these instead:
 ---
 <br>
 
-## 📦 Plugins — 46
+## 📦 Plugins — 47
 
 > Type legend: 🎬 Movie · 🍿 Series · 🎌 Anime · 🧸 Cartoon · 📡 Live TV · ⚽ Sports · ▶️ Video
 >
@@ -110,13 +110,14 @@ The big library — Arabic, Turkish & international films and series.
 | <img width="40" height="40" src="https://img.utdstc.com/icon/a99/c9e/a99c9ee56e731144b335282e9981a54a7584be93fc9644ad7a03b45552307876:200"> | **Viu** | 🍿 | ✔️ | مسلسلات آسيوية وتركية مترجمة بجودة عالية |
 | <img width="40" height="40" src="https://wecima.ac/static/img/favicon.png"> | **Wecima** | 🎬🍿 | ✔️ | مشاهدة وتحميل الأفلام والمسلسلات العربية والأجنبية |
 
-### <span style="color:#e91e63">🎌 Anime & Kids · أنمي وكرتون</span> — 11
+### <span style="color:#e91e63">🎌 Anime & Kids · أنمي وكرتون</span> — 12
 
 Anime, cartoons & children's shows — subbed and dubbed.
 
 | Icon | Plugin | Type | Status | Notes |
 |---|---|---|---|---|
 | <img width="40" height="40" src="https://images.anime3rb.com/favicon/apple-touch-icon.png"> | **Anim3rb** | 🎌 | ✔️ | مشاهدة الأنمي مترجم بالعربية بجودة عالية |
+| <img width="40" height="40" src="https://animezid.cam/templates/egybest-by-mrbrooks/img/favicon.ico"> | **AnimeZid** | 🎌🧸🎬🍿 | ✔️ | مشاهدة وتحميل الأنمي والكرتون والأفلام والمسلسلات مترجمة ومدبلجة |
 | <img width="40" height="40" src="https://yt3.googleusercontent.com/mBIIR5cqQC4Y-o7HaxbkJfs305X6tbHLSNPk6MRMCDJsH8xP0SfGhK-CBDpSmH95wSff9z99sg=s900-c-k-c0x00ffffff-no-rj"> | **Anime-Phoenix** | 🎌 | ✔️ | أحدث حلقات الأنمي مترجمة بالعربية بجودة عالية |
 | <img width="40" height="40" src="https://w1.anime4up.rest/wp-content/uploads/2019/03/Anime4up-Icon-1.png"> | **Anime4up** | 🎌 | ✔️ | مشاهدة الأنمي مترجم ومدبلج بالعربية بجودة عالية |
 | <img width="40" height="40" src="https://raw.githubusercontent.com/Abodabodd/Oldarabrepo/refs/heads/main/img/file_0000000042f861f49090744dc097ee2f.png"> | **Animerco** | 🎌 | ✔️ | مشاهدة الأنمي المترجم والمدبلج بالعربية |
