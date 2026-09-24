@@ -363,34 +363,24 @@ class AnimeZidProvider : MainAPI() {
                 }
                 var finalUrl = launchRes.url
                 var page = launchRes.text
-
-                // 1. MegaMax aggregator (Inertia partial reload for all mirrors & qualities)
                 if (provider.equals("MegaMax", true) || finalUrl.contains("megamax.me", true)) {
                     val mmCount = extractMegaMax(finalUrl, page, subtitleCallback, callback)
                     emitted += mmCount
                     if (mmCount > 0) continue
                 }
-
-                // 2. TurboViPlay / turbovidhls broadcast server (HLS master m3u8)
                 if (provider.contains("Turbo", true) || finalUrl.contains("turbovid", true) || finalUrl.contains("turboviplay", true)) {
                     val turboCount = extractTurboViPlay(finalUrl, page, callback)
                     emitted += turboCount
                     if (turboCount > 0) continue
                 }
-
-                // 3. Direct M3U8 or direct video in page
                 var result = EmbedResult()
                 if (page.removePrefix("\uFEFF").startsWith("#EXTM3U")) {
                     result = result.merge(EmbedResult(listOf(finalUrl to Qualities.Unknown.value)))
                 }
                 result = result.merge(extractDirectFromPage(page))
-
-                // 4. DoodStream / PlayMogo
                 if (result.videos.isEmpty() && isDoodHost(finalUrl)) {
                     result = result.merge(extractDood(finalUrl, page))
                 }
-
-                // 5. Embed POST dl (StreamRuby / RubyVidHub / VidTube)
                 if (result.videos.isEmpty() && isEmbedPostHost(finalUrl)) {
                     result = result.merge(postEmbedDl(finalUrl))
                 }
