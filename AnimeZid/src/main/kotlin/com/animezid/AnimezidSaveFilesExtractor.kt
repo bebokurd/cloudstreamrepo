@@ -32,7 +32,6 @@ class AnimezidSaveFilesExtractor : ExtractorApi() {
         if (embedUrl.isBlank()) return
 
         var fileCode = embedUrl.substringAfterLast("/").substringBefore('?').substringBefore('#')
-        // Links may look like /e/<id>, /<id> or /embed-<id>.html.
         if (fileCode.contains("-")) fileCode = fileCode.substringAfterLast('-')
         fileCode = fileCode.substringBefore('.').trim()
         if (fileCode.isBlank()) return

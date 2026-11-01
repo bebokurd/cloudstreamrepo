@@ -97,8 +97,6 @@ open class AnimezidZidHostExtractor : ExtractorApi() {
             "Referer" to "$origin/",
             "Origin" to origin
         )
-
-        // Host-proxied master playlist -> expanded to every quality.
         val cfNative = json.optString("cfNative")
         if (cfNative.isNotBlank()) {
             val generated = try {
@@ -112,8 +110,6 @@ open class AnimezidZidHostExtractor : ExtractorApi() {
                 emitRaw(cfNative, origin, linkHeaders, callback)
             }
         }
-
-        // Direct source + Cloudflare master playlists.
         listOf("source", "cf").forEach { key ->
             val link = json.optString(key)
             if (link.isNotBlank()) emitRaw(link, origin, linkHeaders, callback)

@@ -37,10 +37,6 @@ class Animezid : MainAPI() {
         "Upgrade-Insecure-Requests" to "1"
     )
 
-    // =========================================================================
-    // Main page sections
-    // =========================================================================
-
     override val mainPage = mainPageOf(
         "$mainUrl/newvideos.php?page=" to "أحدث الإضافات",
         "$mainUrl/category.php?cat=anime&series_sort=newest&series_page=" to "الأنمي",
@@ -64,10 +60,6 @@ class Animezid : MainAPI() {
             hasNext = items.size >= 40
         )
     }
-
-    // =========================================================================
-    // Search
-    // =========================================================================
 
     override suspend fun quickSearch(query: String): List<SearchResponse> = search(query)
 
@@ -145,10 +137,6 @@ class Animezid : MainAPI() {
         }
     }
 
-    // =========================================================================
-    // Load
-    // =========================================================================
-
     override suspend fun load(url: String): LoadResponse {
         return when {
             url.contains("/series/") -> buildSeries(url)
@@ -163,10 +151,6 @@ class Animezid : MainAPI() {
             else -> buildMovie(url, getPage(url))
         }
     }
-
-    // -----------------------------------------------------------------
-    // Series: enumerate every season page and its episodes
-    // -----------------------------------------------------------------
 
     private suspend fun buildSeries(seriesUrl: String): LoadResponse {
         val doc = getPage(seriesUrl)
@@ -248,10 +232,6 @@ class Animezid : MainAPI() {
         }
     }
 
-    // -----------------------------------------------------------------
-    // Movie (single watch.php title)
-    // -----------------------------------------------------------------
-
     private suspend fun buildMovie(watchUrl: String, doc: Document): LoadResponse {
         val rawTitle = doc.selectFirst("h1")?.text()?.trim()
             ?: doc.selectFirst("meta[property=og:title]")?.attr("content")
@@ -277,10 +257,6 @@ class Animezid : MainAPI() {
         }
     }
 
-    // =========================================================================
-    // Load links (protected playback API)
-    // =========================================================================
-
     private data class PlaybackSession(
         val create: String,
         val id: String,
@@ -303,9 +279,6 @@ class Animezid : MainAPI() {
         if (first.embedded.isEmpty()) {
             return loadLegacyEmbeds(getPage(playUrl), playUrl, subtitleCallback, callback)
         }
-
-        // The playback API allows only ~5 resolves per session, so the sources are
-        // processed in batches, each with a freshly opened playback session.
         val batchSize = 5
         var session = first
         var found = false
@@ -452,7 +425,6 @@ class Animezid : MainAPI() {
             try {
                 if (loadExtractor(link, playUrl, subtitleCallback) { callback(it) }) found = true
             } catch (_: Exception) {
-                // ignore
             }
         }
         return found
@@ -472,7 +444,6 @@ class Animezid : MainAPI() {
                     return try { JSONObject(resp.text) } catch (_: Exception) { null }
                 }
             } catch (_: Exception) {
-                // retry
             }
             delay(600L * (attempt + 1))
         }
@@ -541,10 +512,6 @@ class Animezid : MainAPI() {
             else -> data.replace("/watch.php", "/play.php")
         }
     }
-
-    // =========================================================================
-    // Helpers
-    // =========================================================================
 
     private fun isSelfHost(url: String): Boolean {
         val host = try {

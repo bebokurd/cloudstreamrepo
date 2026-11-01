@@ -59,8 +59,6 @@ class AnimezidByseExtractor : ExtractorApi() {
             "Referer" to ref,
             "Origin" to origin,
         )
-
-        // 1) details -> embed_frame_url
         val details = getJson("${ref}api/videos/$mediaId/details", baseHeaders)
             ?: getJson("${ref}api/videos/$mediaId/embed/details", baseHeaders)
             ?: return
@@ -76,12 +74,8 @@ class AnimezidByseExtractor : ExtractorApi() {
             headers["Referer"] = embedRef
             headers["Origin"] = embedOrigin
         }
-
-        // 2) settings
         val captchaRequired = getJson("${embedRef}api/videos/$playbackId/${embedPath}settings", headers)
             ?.optBoolean("captcha_required", false) ?: false
-
-        // 3) captcha / fingerprint
         val fingerprint = buildFingerprint()
         if (captchaRequired) {
             val captcha = postJson(
@@ -110,8 +104,6 @@ class AnimezidByseExtractor : ExtractorApi() {
             val captureToken = verify.optString("token")
             if (captureToken.isNotBlank()) headers["X-Captcha-Token"] = captureToken
         }
-
-        // 4) playback
         val playback = postJson(
             "${embedRef}api/videos/$playbackId/${embedPath}playback",
             headers,
@@ -261,8 +253,6 @@ class AnimezidByseExtractor : ExtractorApi() {
         )
     }
 
-    // --- proof of work (custom 512-word hash) ---------------------------------
-
     private fun solvePow(token: String, difficulty: Int, timeoutMs: Long = 20_000L): String? {
         if (difficulty <= 0) return "0"
         val start = System.currentTimeMillis()
@@ -359,8 +349,6 @@ class AnimezidByseExtractor : ExtractorApi() {
         }
         return count
     }
-
-    // --- helpers --------------------------------------------------------------
 
     private fun originOf(url: String): String? {
         val index = url.indexOf("://")

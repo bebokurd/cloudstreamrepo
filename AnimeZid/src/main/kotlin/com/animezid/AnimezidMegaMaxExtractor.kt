@@ -59,9 +59,6 @@ class AnimezidMegaMaxExtractor : ExtractorApi() {
         }
         val attachments = root.optJSONObject("props")?.optJSONArray("attachments") ?: return
         val version = root.optString("version")
-
-        // Laravel expects the URL-decoded XSRF-TOKEN cookie value. NiceHttp may
-        // hand us the raw (percent-encoded) cookie, so only decode when needed.
         val xsrf = pageResp.cookies["XSRF-TOKEN"]?.let { raw ->
             if (raw.contains('%')) {
                 runCatching { URLDecoder.decode(raw, "UTF-8") }.getOrDefault(raw)
@@ -116,9 +113,6 @@ class AnimezidMegaMaxExtractor : ExtractorApi() {
                 val raw = mirror.optString("link")
                 if (raw.isBlank()) continue
                 val streamUrl = if (raw.startsWith("//")) "https:$raw" else raw
-                // Byse/LuluStream/Voe resolve their quality ladder themselves and
-                // report it back; Streamtape/Mp4Upload return an unqualified link so
-                // we tag the attachment's resolution.
                 val selfQualified = driver in SELF_QUALIFIED_DRIVERS
                 val displayName = if (selfQualified) "$name $driverLabel" else "$name $driverLabel $label"
 
@@ -126,7 +120,6 @@ class AnimezidMegaMaxExtractor : ExtractorApi() {
                 try {
                     loadExtractor(streamUrl, "$mainUrl/", subtitleCallback) { resolved.add(it) }
                 } catch (_: Exception) {
-                    // ignore and continue with the next quality
                 }
 
                 resolved.forEach { link ->

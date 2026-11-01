@@ -33,7 +33,6 @@ open class AnimezidStreamRubyExtractor : ExtractorApi() {
         if (embedUrl.isBlank()) return
 
         var fileCode = embedUrl.substringAfterLast("/").substringBefore('?').substringBefore('#')
-        // Some links look like /e/prefix-code.html ; keep the trailing 12-char code.
         if (fileCode.contains("-")) fileCode = fileCode.substringAfterLast('-')
         fileCode = fileCode.substringBefore('.').trim()
         if (fileCode.isBlank()) return

@@ -52,8 +52,6 @@ open class AnimezidUqloadExtractor : ExtractorApi() {
             "Accept" to "*/*",
             "Referer" to "$origin/"
         )
-
-        // Prefer an HLS master playlist (expanded to all qualities).
         val m3u8 = texts.asSequence()
             .flatMap { Regex("""https?://[^"'<>\s]+\.m3u8[^"'<>\s]*""").findAll(it).map { m -> m.value } }
             .firstOrNull { it.isNotBlank() }
@@ -68,8 +66,6 @@ open class AnimezidUqloadExtractor : ExtractorApi() {
                 return
             }
         }
-
-        // Fallback: direct mp4.
         val mp4 = texts.asSequence()
             .flatMap { Regex("""https?://[^"'<>\s]+\.mp4[^"'<>\s]*""").findAll(it).map { m -> m.value } }
             .firstOrNull { it.isNotBlank() } ?: return
