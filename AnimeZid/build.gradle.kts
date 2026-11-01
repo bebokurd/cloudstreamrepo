@@ -1,19 +1,38 @@
-version = 2
+plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+}
 
-cloudstream {
-    description = "مشاهدة وتحميل الأنمي والكرتون والأفلام والمسلسلات مترجمة ومدبلجة للعربية"
-    authors = listOf("bebokurd")
-    language = "ar"
+repositories {
+    mavenCentral()
+    maven { url = uri("https://jitpack.io") }
+}
 
-    status = 1
+android {
+    namespace = "com.animezid"
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 21
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            freeCompilerArgs.addAll(
+                "-XXLanguage:+BreakContinueInInlineLambdas",
+                "-Xskip-metadata-version-check"
+            )
+        }
+    }
+}
 
-    tvTypes = listOf(
-        "Anime",
-        "AnimeMovie",
-        "Cartoon",
-        "TvSeries",
-        "Movie"
-    )
-
-    iconUrl = "https://animezid.cam/templates/egybest-by-mrbrooks/img/favicon.ico"
+dependencies {
+    val cloudstream by configurations
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.browser:browser:1.9.0")
+    implementation("androidx.room:room-ktx:2.8.0")
+    cloudstream("com.lagradost:cloudstream3:pre-release")
 }
